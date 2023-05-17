@@ -7,12 +7,28 @@
 		</div>
 	</div>
 </nav>
-
 <slot />
+<footer>
+	<div class="footer-body">
+		<div class="footer-names">
+			<p class="text kr-name">박찬혁</p>
+			<p class="text">ChanHyuk Park</p>
+		</div>
+
+		<div class="footer-links">
+			<p class="text">박찬혁</p>
+		</div>
+	</div>
+</footer>
 
 <style>
 	:global(body) {
 		margin: 0;
+		background-color: #979797;
+	}
+
+	:global(.test-box) {
+		border: 2px solid black;
 	}
 
 	:global(.text) {
@@ -21,7 +37,7 @@
 		color: #ffffff;
 	}
 	.navbar-top {
-		background-color: black;
+		background-color: #212121;
 		height: 80px;
 		display: flex;
 		justify-content: space-between;
@@ -44,5 +60,32 @@
 		display: flex;
 		width: 300px;
 		justify-content: space-between;
+	}
+
+	footer {
+		height: 210px;
+		width: 100%;
+		background-color: #212121;
+	}
+
+	.footer-body {
+		display: flex;
+	}
+
+	.footer-names {
+		flex: 2;
+	}
+
+	.footer-links {
+		flex: 1;
+	}
+
+	.kr-name {
+		font-size: 3em;
+		font-weight: bold;
+	}
+
+	p {
+		margin: 0;
 	}
 </style>
