@@ -2,17 +2,19 @@
 	import Footer from './footer.svelte';
 </script>
 
-<nav>
-	<div class="navbar-top">
-		<span class="navbar-title text">ChanHyuk's Log</span>
-		<div class="navbar-btn">
-			<a href="/" class="navbar-btn-text text">Home</a>
-			<a href="/blog" class="navbar-btn-text text">Blog</a>
+<div id="wrap">
+	<nav>
+		<div class="navbar-top">
+			<span class="navbar-title text">ChanHyuk's Log</span>
+			<div class="navbar-btn">
+				<a href="/" class="navbar-btn-text text">Home</a>
+				<a href="/blog" class="navbar-btn-text text">Blog</a>
+			</div>
 		</div>
-	</div>
-</nav>
-<slot />
-<Footer />
+	</nav>
+	<slot />
+	<Footer />
+</div>
 
 <style>
 	:global(body) {
@@ -28,6 +30,13 @@
 		font-family: 'Pretendard';
 		font-style: normal;
 		color: #ffffff;
+	}
+
+	#wrap {
+		min-height: 100vh;
+		position: relative;
+		widows: 100%;
+		padding-bottom: 210px;
 	}
 	.navbar-top {
 		background-color: #212121;

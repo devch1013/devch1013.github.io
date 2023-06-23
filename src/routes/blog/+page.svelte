@@ -1,4 +1,8 @@
 <script>
+	import { formatDate } from '$lib/utils';
+	// import * as config from '$lib/config';
+
+	export let data;
 </script>
 
 <div class="post-list">
@@ -6,7 +10,15 @@
 		<p>All</p>
 		<p>AI</p>
 	</div>
-	<div class="posts" />
+	{#each data.posts as post}
+		<div class="posts">
+			<a href="blog/{post.slug}" class="title">{post.title}</a>
+			<p class="date">{formatDate(post.date)}</p>
+			<p class="description">{post.description}</p>
+		</div>
+		<hr />
+	{/each}
+	<!-- <div class="posts" />
 	<hr />
 	<div class="posts" />
 	<hr />
@@ -18,7 +30,7 @@
 	<hr />
 	<div class="posts" />
 	<hr />
-	<div class="posts" />
+	<div class="posts" /> -->
 </div>
 
 <style>

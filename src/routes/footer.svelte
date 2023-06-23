@@ -24,6 +24,8 @@
 		height: 210px;
 		width: 100%;
 		background-color: #212121;
+		bottom: 0px;
+		position: absolute;
 	}
 
 	.footer-body {
