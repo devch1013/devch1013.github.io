@@ -31,6 +31,6 @@ _site/
 docs
 test
 screenshots
-/*.md
 screenshot.jpg
 *.bat
+.trash
