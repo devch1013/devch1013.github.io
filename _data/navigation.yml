@@ -1,0 +1,31 @@
+header:
+  - titles:
+      # @start locale config
+      en      : &EN       About
+      en-GB   : *EN
+      en-US   : *EN
+      en-CA   : *EN
+      en-AU   : *EN
+      ko      : &KO       소개
+      ko-KR   : *KO
+
+      # @end locale config
+    url: /about.html
+
+  - titles:
+      en      : &EN       Projects
+      ko      : &KO       프로젝트
+    url: /projects.html
+    key: projects
+
+  - titles:
+      # @start locale config
+      en      : &EN       Archive
+      en-GB   : *EN
+      en-US   : *EN
+      en-CA   : *EN
+      en-AU   : *EN
+      ko      : &KO       아카이브
+      ko-KR   : *KO
+      # @end locale config
+    url: /archive.html

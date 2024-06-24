@@ -1,0 +1,14 @@
+---
+layout: page
+titles:
+  # @start locale config
+  en      : &EN       Projects
+  ko      : &KO       프로젝트
+  ko-KR   : *KO
+show_title: true
+---
+<div class="layout--articles">
+  <section class="my-5">
+    {%- include article-list.html articles=site.projects type='grid' size="sm" reverse=true -%}
+  </section>
+</div>
