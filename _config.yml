@@ -36,7 +36,7 @@ timezone:
 author:
   type      : person
   name      : Devch
-  url       :
+  url       : https://devch1013.github.io
   avatar    : https://avatars.githubusercontent.com/u/92439610?v=4
   bio       : hello.
   email     :
@@ -228,7 +228,7 @@ defaults:
 ## => Plugins
 ##############################
 plugins:
-  - jekyll-feed
+  - jekyll-feed 
   - jekyll-paginate
   - jekyll-sitemap
   - jemoji
