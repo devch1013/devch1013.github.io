@@ -62,12 +62,12 @@ AI 서버(FastAPI), 서비스 서버(Spring) 개발
 - 연세대학교 창업 경진대회 우수
 - 2023 산학협력 Expo 인기상 수상
 
-**Essential Citronnier CTO (창업팀)**
-2024.03 ~ 현재
-의료 교육 플랫폼 기획, 개발
-Spring Boot, Django, FastAPI 서버 개발
-Langchain 기반 AI 모듈 개발
-- 연세대학교 창업 경진대회 우수
+**Essential Citronnier CTO (창업팀)**  
+2024.03 ~ 현재  
+의료 교육 플랫폼 기획, 개발  
+Spring Boot, Django, FastAPI 서버 개발  
+Langchain 기반 AI 모듈 개발  
+- 연세대학교 창업 경진대회 우수  
 
 [프로젝트 목록](/projects.html)
 
