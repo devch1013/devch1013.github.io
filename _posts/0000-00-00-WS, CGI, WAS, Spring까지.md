@@ -39,8 +39,8 @@ Spring boot의 내장 tomcat은 클라이언트의 요청이 들어오면 적절
 
 ## 코드
 실제 Spring 서버가 어떻게 동작하는지 확인하기 위해 간단한 controller를 만들어 breakpoint를 걸고 확인해보았다.  
-![](/assets/images/postImages/0000-00-00-WS,%20CGI,%20WAS,%20Spring까지-2.png){width="80%" .center}
-![](/assets/images/postImages/0000-00-00-WS,%20CGI,%20WAS,%20Spring까지-3.png){width="80%" .center}
+![](/assets/images/postImages/0000-00-00-WS,%20CGI,%20WAS,%20Spring까지-2.png){: width="80%" .center}
+![](/assets/images/postImages/0000-00-00-WS,%20CGI,%20WAS,%20Spring까지-3.png){: width="80%" .center}
 
 Get 요청을 했을 때 Spring boot에서 거치는 함수들의 목록이다.
 가장 먼저 Thread를 만드는 것을 볼 수 있다. 이후 SocketProcessor를 통해 TCP 소켓 연결을 한다. 실제 NioEndpoint 클래스의 SocketProcessor에서 소켓의 Handshaking 과정을 받아오는 것을 볼 수 있었다.  
