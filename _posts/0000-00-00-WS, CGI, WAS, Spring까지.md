@@ -19,7 +19,7 @@ ex) Nginx, Apache 등
 웹 서버와 외부 프로그램 사이에서 정보를 주고받는 방법이나 규약, 표준  
 이 표준에 맞춰진게 CGI 스크립트 -> 프로그래밍 언어에 제약이 없음  
 
-![](/assets/images/postImages/0000-00-00-WS,%20CGI,%20WAS,%20Spring까지.png){width="80%" .center}
+![](/assets/images/postImages/0000-00-00-WS,%20CGI,%20WAS,%20Spring까지.png){: width="80%" .center}
 
 웹 서버에 폴더를 하나 따로 만들어서 필요한 스크립트 파일들을 저장했다가 필요하면 실행하는 방식  
 CGI 프로그램이 매번 프로세스를 새로 만들어서 코드를 실행하기 때문에 부하가 심하다.  
@@ -44,7 +44,7 @@ Spring boot의 내장 tomcat은 클라이언트의 요청이 들어오면 적절
 
 Get 요청을 했을 때 Spring boot에서 거치는 함수들의 목록이다.
 가장 먼저 Thread를 만드는 것을 볼 수 있다. 이후 SocketProcessor를 통해 TCP 소켓 연결을 한다. 실제 NioEndpoint 클래스의 SocketProcessor에서 소켓의 Handshaking 과정을 받아오는 것을 볼 수 있었다.  
-![](../assets/images/postImages/0000-00-00-WS,%20CGI,%20WAS,%20Spring까지-4.png){width="80%" .center}
+![](../assets/images/postImages/0000-00-00-WS,%20CGI,%20WAS,%20Spring까지-4.png){: width="80%" .center}
  그 다음 Http11Processor에서 요청을 파싱하여 request와 response를 생성하게 된다. 이 object들은 요청이 끝나고 응답이 갈 때 까지 사용되게 된다.
 
 이후 지정되어있는 여러 Filter들을 지난다. 그 후에 request와 response가 HttpServletResponse, HttpServletRequest로 바뀌고 요청이 get인지 post인지 put인지 등으로 구분 후 dispatcherServlet으로 넘어가게 된다.
