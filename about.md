@@ -69,6 +69,11 @@ Spring Boot, Django, FastAPI 서버 개발
 Langchain 기반 AI 모듈 개발  
 - 연세대학교 창업 경진대회 우수  
 
+### 논문  
+**AVIN-Chat: An Audio-Visual Interactive Chatbot System with Emotional State Tuning**  
+IJCAI Demo Track. 8763-8766 (2024)  
+[Arxiv](https://arxiv.org/abs/2409.00012), [IJCAI](https://www.ijcai.org/proceedings/2024/1027)  
+
 [프로젝트 목록](/projects.html)
 
 #### 🛠️ Skills
