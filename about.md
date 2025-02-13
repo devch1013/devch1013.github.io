@@ -27,6 +27,7 @@ key: page-about
 ---
 ## 박찬혁(ChanHyuk Park)
 
+기술로 문제를 해결하는 것을 좋아하는 개발자 박찬혁입니다.
 
 **Email:** devch1013@gmail.com  
 **Github:** [https://github.com/devch1013](https://github.com/devch1013)
