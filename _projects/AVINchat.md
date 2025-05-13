@@ -12,7 +12,7 @@ date: 2024-02-19
 * Unity 클라이언트 개발
 	* 웹캠 카메라 캡처, 음성 녹음, 3D object 다운로드\배치, 음성 재생
 * FastAPI 백엔드 개발(AI 모델 연동)
-* HRN - LDT - Blender | Whisper - ChatGPT - Emotivoice 파이프라인의 각 레이어 모듈 개발
+* HRN - LDT - Blender / Whisper - ChatGPT - Emotivoice 파이프라인의 각 레이어 모듈 개발
 	* HRN 모델을 사용하여 이미지 입력 - 3D face 생성
 	* LDT를 사용해 base face로 52개의 표정 face object 생성(병렬처리로 처리 속도 개선)
 	* Blender python API를 사용하여 하나의 BlendShape object로 변환
