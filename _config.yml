@@ -24,6 +24,11 @@ title   : Devch github.io
 description: > # this means to ignore newlines until "Language & timezone"
   Devch github.io
 
+## => Languages
+##############################
+languages: ["ko", "en"]
+default_lang: "ko"
+exclude_from_localizations: ["assets", "favicon.ico", "robots.txt"]
 
 ## => Language and Timezone
 ##############################

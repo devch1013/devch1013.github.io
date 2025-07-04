@@ -34,6 +34,22 @@
               <li class="navigation__item"><a href="{{ _nav_url }}">{%- if _item.title -%}{{ _item.title }}{%- else -%}{{ __return }}{%- endif -%}</a></li>
             {%- endif -%}
           {%- endfor -%}
+          <!-- Language Switcher -->
+          {%- if site.languages.size > 1 -%}
+            <li class="navigation__item">
+              <span class="language-switcher">
+                {%- for lang in site.languages -%}
+                  {%- if lang == page.lang -%}
+                    <span class="language-switcher__item language-switcher__item--active">{{ lang | upcase }}</span>
+                  {%- else -%}
+                    {%- assign lang_url = page.url | replace_first: page.lang, lang -%}
+                    <a class="language-switcher__item" href="{{ lang_url }}">{{ lang | upcase }}</a>
+                  {%- endif -%}
+                  {%- unless forloop.last -%} | {%- endunless -%}
+                {%- endfor -%}
+              </span>
+            </li>
+          {%- endif -%}
           {%- if site.search.provider -%}
             <li><button class="button button--secondary button--circle search-button js-search-toggle"><i class="fas fa-search"></i></button></li>
           {%- endif -%}
