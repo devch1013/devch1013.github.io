@@ -19,6 +19,13 @@ header:
     key: projects
 
   - titles:
+      en      : &EN       Codex
+      ko      : &KO       코덱스
+      ko-KR   : *KO
+    url: /codex.html
+    key: codex
+
+  - titles:
       # @start locale config
       en      : &EN       Archive
       en-GB   : *EN

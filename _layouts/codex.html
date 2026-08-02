@@ -1,0 +1,19 @@
+---
+layout: page
+titles:
+  # @start locale config
+  en      : &EN       Codex
+  ko      : &KO       코덱스
+  ko-KR   : *KO
+  # @end locale config
+show_title: true
+---
+<div class="article__content">
+  <p class="info">개발하며 마주친 기술 문제를 AI가 <strong>문제 상황 · 해결 과정 · 관련 이론</strong> 순으로 정리한 학습용 기록입니다.</p>
+</div>
+
+<div class="layout--articles">
+  <section class="my-5">
+    {%- include article-list.html articles=site.codex type='item' show_excerpt=true show_readmore=true show_info=true reverse=true -%}
+  </section>
+</div>
