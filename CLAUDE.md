@@ -41,9 +41,21 @@ Article defaults (sharing, license, toc, pageview) come from `defaults:` in `_co
 
 Images go in `assets/images/` (`cover/` for card covers, `postImages/` for inline).
 
+### Adding a Codex entry
+
+`_codex/` is the AI-authored study-notes section (`/codex.html`, nav "Codex"): writeups of technical problems the author hit, structured 문제 상황 → 원인 → 해결 → 관련 이론. This is the one section Claude is expected to write end to end.
+
+1. **Copy `templates/CODEX.md` to `_codex/<slug>.md`.** The filename becomes the URL — `_codex/jvm-gc-pause.md` → `/codex/jvm-gc-pause.html`. Unlike `_posts/`, there is no `0000-00-00-` date prefix. A filename starting with `_` is silently skipped by Jekyll.
+2. **Front matter needs only `title`, `date`, `tags`.** `layout: article`, toc, sharing, license, pageview and `nav_key: codex` all come from the `type: codex` defaults in `_config.yml`. `date` drives the index order (newest first) — always set it. `published: false` keeps a draft out of the build.
+3. **Write a one-line summary, then `<!--more-->`, then the body.** The separator is required: `excerpt_separator` is `<!--more-->` site-wide, so omitting it makes the *entire document* the excerpt, and the list card renders the whole article truncated at 200 chars. With it, the card shows exactly the summary line.
+4. **Body sections are `h2`** (`## 문제 상황`, `## 원인`, `## 해결`, `## 관련 이론`) — the aside TOC is generated from them.
+5. `bundle exec jekyll build` to verify. Search indexing is automatic (`search-data.js` walks every collection); the entry does *not* appear in the home feed or `/archive.html`, which both read `site.posts` only.
+
+Don't set `cover:` on codex entries — `_layouts/codex.html` lists them with `article-list.html type='item'` and no `show_cover`, so covers are ignored.
+
 ## Architecture notes
 
-**Layout chain:** `none` → `base` (html shell, inlines JS from `_includes/scripts/`) → `page`/`article`/`articles` → `home`, `archive`, `projects`, `landing`, `404`. Root `*.html` files (`index`, `projects`, `archive`, `404`) are front-matter-only stubs pointing at a layout.
+**Layout chain:** `none` → `base` (html shell, inlines JS from `_includes/scripts/`) → `page`/`article`/`articles` → `home`, `archive`, `projects`, `codex`, `landing`, `404`. Root `*.html` files (`index`, `projects`, `codex`, `archive`, `404`) are front-matter-only stubs pointing at a layout.
 
 **Snippet "functions":** `_includes/snippets/*.html` emulate function calls — they take `include.*` args and write their result into a global `__return`. Always capture immediately:
 ```liquid
