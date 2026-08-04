@@ -65,6 +65,29 @@ Images go in `assets/images/` (`cover/` for card covers, `postImages/` for inlin
 
 Don't set `cover:` on codex entries — `_layouts/codex.html` lists them with `article-list.html type='item'` and no `show_cover`, so covers are ignored.
 
+### Visuals in Codex entries
+
+Codex explains mechanisms, and mechanisms have flow, state and timing — prefer a diagram over three paragraphs of prose. Aim for at least one visual per entry, but never decorative ones.
+
+**Diagrams and charts are per-page opt-in.** `_data/variables.yml` defaults `mermaid`, `chart` and `mathjax` to `false` and `_config.yml` does not override them, so a page without the flag renders the fence as a plain code block — the build still succeeds. Set only what the entry uses:
+
+```yaml
+mermaid: true   # ```mermaid fences
+chart: true     # ```chart fences (Chart.js JSON)
+mathjax: true   # $$...$$
+```
+
+`_includes/markdown-enhancements/*.html` lazy-loads each library from `_data/variables.yml` `sources`. The pinned versions are old and constrain the syntax:
+
+- **mermaid `8.0.0-rc.8`** — its `detectType` matches exactly four keywords (`sequenceDiagram`, `gantt`, `classDiagram`, `gitGraph`) and sends **everything else to the flowchart parser**. So the usable set is `graph`/`flowchart`, `sequenceDiagram`, `classDiagram`, `gantt`, `gitGraph` — and `stateDiagram`, `erDiagram`, `journey`, `pie`, `mindmap`, `timeline` don't degrade gracefully, they hit the flowchart grammar and fail to render. Draw state transitions as `graph LR`; use a table for proportions.
+- **Chart.js `2.7.2`** — v2 config schema, so axes are `"scales": {"yAxes": [...]}`, not the v3+ flat form.
+
+The site ships a single light skin (`text_skin: default`, `#fff` background), so visuals don't need dark-mode variants.
+
+**Interactive sections go in `_includes/codex/<slug>.html`,** pulled in with `{% include codex/<slug>.html %}`. Reserve them for cases where changing a value is what makes the mechanism click (scheduling order, cache hit/miss, concurrency timing). Rules: no `iframe` (breaks auto-height, TOC, search and print — an include has none of those problems); scope all CSS under one wrapper class, never bare element or generic selectors, since the entry's stylesheet is the theme's; vanilla JS only, inline in the same file, wrapped in an IIFE because a page may hold several includes; use native controls (`<button>`, `<input type="range">`) so keyboard access comes free; and keep the entry readable with JS off — anything only the widget says must also appear as a sentence in the prose.
+
+Redaction applies to visuals exactly as it does to code: no screenshots, and no diagram that reproduces a real work architecture.
+
 ### Redacting work content in Codex entries
 
 Most codex entries start from a problem hit at work, and everything here is published publicly. Write every entry as if it will be read by someone trying to learn about the author's employer's systems.
