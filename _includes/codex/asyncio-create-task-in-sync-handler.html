@@ -1,0 +1,208 @@
+<div class="cdxls">
+<style>
+.cdxls {
+  border: 1px solid rgba(0,0,0,.12);
+  border-radius: 6px;
+  padding: 1.1rem 1.2rem 1.2rem;
+  margin: 1.6rem 0;
+  font-size: .93rem;
+  line-height: 1.6;
+}
+.cdxls .cdxls-hd {
+  font-weight: 700;
+  margin: 0 0 .15rem;
+}
+.cdxls .cdxls-sub {
+  margin: 0 0 1rem;
+  color: #888;
+  font-size: .85rem;
+}
+.cdxls .cdxls-grp {
+  border: 0;
+  padding: 0;
+  margin: 0 0 .75rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: .4rem;
+}
+.cdxls .cdxls-grp legend {
+  float: left;
+  width: 6.2rem;
+  padding: 0;
+  color: #888;
+  font-size: .82rem;
+}
+.cdxls .cdxls-grp label {
+  display: inline-block;
+  padding: .3rem .7rem;
+  border: 1px solid rgba(0,0,0,.15);
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: Menlo, Consolas, monospace;
+  font-size: .82rem;
+  color: #444;
+  transition: background-color .12s, border-color .12s, color .12s;
+}
+.cdxls .cdxls-grp label:hover { border-color: #fc4d50; color: #fc4d50; }
+.cdxls .cdxls-grp input {
+  position: absolute;
+  width: 1px; height: 1px;
+  opacity: 0;
+  margin: 0;
+}
+.cdxls .cdxls-grp label:has(input:checked) {
+  background: #fc4d50;
+  border-color: #fc4d50;
+  color: #fff;
+}
+.cdxls .cdxls-grp label:has(input:focus-visible) {
+  outline: 2px solid #fc4d50;
+  outline-offset: 2px;
+}
+
+.cdxls .cdxls-out {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed rgba(0,0,0,.15);
+}
+/* :has() 미지원 시엔 6가지 결과가 전부 펼쳐진 목록으로 보인다 (정보 손실 없음) */
+.cdxls .cdxls-p { display: block; }
+.cdxls .cdxls-p + .cdxls-p { margin-top: 1rem; padding-top: 1rem; border-top: 1px dotted rgba(0,0,0,.12); }
+@supports selector(:has(*)) {
+  .cdxls .cdxls-p { display: none; }
+  .cdxls .cdxls-p + .cdxls-p { margin-top: 0; padding-top: 0; border-top: 0; }
+}
+.cdxls .cdxls-p > :first-child { margin-top: 0; }
+.cdxls .cdxls-p > :last-child { margin-bottom: 0; }
+.cdxls .cdxls-p p { margin: .5rem 0 0; }
+
+.cdxls .cdxls-badge {
+  display: inline-block;
+  padding: .1rem .5rem;
+  border-radius: 3px;
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+.cdxls .cdxls-badge.ok   { background: #e3f4e9; color: #1c7a44; }
+.cdxls .cdxls-badge.err  { background: #fde8e8; color: #c0292c; }
+.cdxls .cdxls-badge.warn { background: #fdf1dd; color: #99650a; }
+.cdxls .cdxls-tag {
+  display: inline-block;
+  margin-left: .35rem;
+  padding: .1rem .5rem;
+  border: 1px solid rgba(0,0,0,.18);
+  border-radius: 3px;
+  font-size: .75rem;
+  color: #666;
+}
+.cdxls .cdxls-where {
+  margin: .55rem 0 0;
+  font-size: .82rem;
+  color: #888;
+}
+.cdxls .cdxls-where b {
+  color: #222;
+  font-weight: 600;
+}
+.cdxls code {
+  font-family: Menlo, Consolas, monospace;
+  font-size: .84em;
+  background: rgba(0,0,0,.05);
+  padding: .1em .35em;
+  border-radius: 3px;
+}
+.cdxls .cdxls-log {
+  margin: .6rem 0 0;
+  padding: .5rem .7rem;
+  background: rgba(0,0,0,.05);
+  border-left: 3px solid rgba(0,0,0,.2);
+  font-family: Menlo, Consolas, monospace;
+  font-size: .78rem;
+  color: #555;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.cdxls .cdxls-p.err-panel .cdxls-log { border-left-color: #fc4d50; }
+
+@media (max-width: 520px) {
+  .cdxls .cdxls-grp { display: block; }
+  .cdxls .cdxls-grp legend { float: none; width: auto; margin-bottom: .3rem; }
+  .cdxls .cdxls-grp label { margin: 0 .3rem .3rem 0; }
+}
+
+.cdxls:has([name="cdxls-h"][value="a"]:checked):has([name="cdxls-m"][value="t"]:checked) .p-a-t,
+.cdxls:has([name="cdxls-h"][value="a"]:checked):has([name="cdxls-m"][value="r"]:checked) .p-a-r,
+.cdxls:has([name="cdxls-h"][value="a"]:checked):has([name="cdxls-m"][value="b"]:checked) .p-a-b,
+.cdxls:has([name="cdxls-h"][value="s"]:checked):has([name="cdxls-m"][value="t"]:checked) .p-s-t,
+.cdxls:has([name="cdxls-h"][value="s"]:checked):has([name="cdxls-m"][value="r"]:checked) .p-s-r,
+.cdxls:has([name="cdxls-h"][value="s"]:checked):has([name="cdxls-m"][value="b"]:checked) .p-s-b {
+  display: block;
+}
+</style>
+
+<p class="cdxls-hd">핸들러 선언 &times; 후처리 호출</p>
+<p class="cdxls-sub">두 축을 바꿔가며 코루틴이 어디서 돌고, 무엇이 깨지는지 확인해 보세요.</p>
+
+<fieldset class="cdxls-grp">
+  <legend>핸들러 선언</legend>
+  <label><input type="radio" name="cdxls-h" value="a" checked><span>async def</span></label>
+  <label><input type="radio" name="cdxls-h" value="s"><span>def</span></label>
+</fieldset>
+
+<fieldset class="cdxls-grp">
+  <legend>후처리 호출</legend>
+  <label><input type="radio" name="cdxls-m" value="t" checked><span>asyncio.create_task()</span></label>
+  <label><input type="radio" name="cdxls-m" value="r"><span>asyncio.run()</span></label>
+  <label><input type="radio" name="cdxls-m" value="b"><span>BackgroundTasks</span></label>
+</fieldset>
+
+<div class="cdxls-out">
+
+  <div class="cdxls-p p-a-t">
+    <span class="cdxls-badge ok">동작</span>
+    <p class="cdxls-where">실행 위치 · <b>이벤트 루프 스레드</b> — 응답 블로킹 <b>없음</b></p>
+    <p>루프가 도는 스레드 위라 <code>get_running_loop()</code> 이 성공한다. 태스크가 루프에 등록되고 핸들러는 즉시 반환한다.</p>
+    <p>다만 루프는 태스크를 <b>약한 참조로만</b> 붙든다. 반환된 태스크 객체를 아무도 들고 있지 않으면 완료 전에 GC 되어 사라질 수 있다 — fire-and-forget 이라도 참조를 어딘가 보관해야 한다.</p>
+  </div>
+
+  <div class="cdxls-p p-a-r err-panel">
+    <span class="cdxls-badge err">예외</span>
+    <p class="cdxls-where">실행 위치 · <b>이벤트 루프 스레드</b></p>
+    <p><code>asyncio.run()</code> 은 <b>새 루프를 만든다.</b> 이미 루프가 도는 스레드에서는 중첩이 불가능해 거부당한다.</p>
+    <p class="cdxls-log">RuntimeError: asyncio.run() cannot be called
+from a running event loop</p>
+  </div>
+
+  <div class="cdxls-p p-a-b">
+    <span class="cdxls-badge ok">동작</span>
+    <p class="cdxls-where">실행 위치 · 등록은 <b>루프 스레드</b>, 실행은 <b>응답 전송 후</b> — 응답 블로킹 <b>없음</b></p>
+    <p>루프 위에서도 <code>BackgroundTasks</code> 는 그대로 쓸 수 있다. 코루틴이면 헬퍼가 전용 루프로 완주시키고, 동기 함수면 스레드풀에서 돈다.</p>
+  </div>
+
+  <div class="cdxls-p p-s-t err-panel">
+    <span class="cdxls-badge err">예외</span><span class="cdxls-tag">이 글의 버그</span>
+    <p class="cdxls-where">실행 위치 · <b>anyio 워커 스레드</b></p>
+    <p>워커 스레드에는 도는 루프가 없다. <code>create_task</code> 는 루프를 만들지 않고 <b>찾을</b> 뿐이라 그 줄에서 즉사하고, 핸들러는 500 을 뱉는다.</p>
+    <p>띄우려던 코루틴은 태워지지도 <code>await</code> 되지도 못한 채 GC 되어 두 번째 경고를 남긴다. <b>두 줄은 별개 사건이 아니라 인과다.</b></p>
+    <p class="cdxls-log">RuntimeError: no running event loop
+RuntimeWarning: coroutine 'notify' was never awaited</p>
+  </div>
+
+  <div class="cdxls-p p-s-r">
+    <span class="cdxls-badge warn">동작하지만 블로킹</span><span class="cdxls-tag">버린 대안</span>
+    <p class="cdxls-where">실행 위치 · <b>anyio 워커 스레드</b> — 응답 블로킹 <b>있음</b></p>
+    <p>도는 루프가 없는 스레드라 <code>asyncio.run()</code> 이 새 루프를 열어 코루틴을 완주시킨다. 예외는 안 난다.</p>
+    <p>대신 알림이 끝날 때까지 핸들러가 반환하지 못해 그만큼 응답이 늦어진다. 굴러가긴 하나 <b>fire-and-forget 이 아니다.</b></p>
+  </div>
+
+  <div class="cdxls-p p-s-b">
+    <span class="cdxls-badge ok">동작</span><span class="cdxls-tag">채택안</span>
+    <p class="cdxls-where">실행 위치 · 등록은 <b>워커 스레드</b>, 실행은 <b>응답 전송 후</b> — 응답 블로킹 <b>없음</b></p>
+    <p>핸들러는 등록만 하고 즉시 반환한다. 응답이 나간 뒤 헬퍼가 코루틴을 전용 루프로 완주시킨다. 블로킹 없이 후처리가 실제로 실행되는 유일한 조합이다.</p>
+    <p>단 같은 프로세스 안이라 <b>영속성도 재시도도 없다.</b> 반드시 완료돼야 하는 작업은 외부 큐의 몫이다.</p>
+  </div>
+
+</div>
+</div>
