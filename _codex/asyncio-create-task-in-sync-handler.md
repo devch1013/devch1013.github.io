@@ -3,6 +3,7 @@ title: "동기 FastAPI 핸들러에서 asyncio.create_task 가 조용히 죽는 
 tags: [python, asyncio, fastapi]
 date: 2026-08-02
 published: true
+mermaid: true
 ---
 
 `def` 핸들러는 이벤트 루프가 아니라 스레드풀에서 돈다 — 그 안의 `asyncio.create_task()` 는 잡을 루프가 없어 코루틴째로 유실된다.
@@ -46,6 +47,20 @@ FastAPI(Starlette)는 핸들러를 선언 방식에 따라 다른 곳에서 실�
 붙인다. 내부적으로 `get_running_loop()` 를 부르는데, 스레드풀 워커 스레드에는 도는
 루프가 없다. 그래서 `RuntimeError: no running event loop` 로 죽는다.
 
+한 글자 차이로 코드가 어디서 실행되는지가 갈리고, 거기서 운명이 결정된다.
+
+```mermaid
+graph TD
+  R[요청 도착] --> S{핸들러 선언}
+  S -->|async def| L[이벤트 루프 스레드]
+  S -->|def| W[anyio 워커 스레드풀]
+  L --> LOK[도는 루프 있음]
+  W --> WNO[도는 루프 없음]
+  LOK --> OK[create_task 성공<br/>태스크가 루프에 등록됨]
+  WNO --> ERR[RuntimeError<br/>no running event loop]
+  ERR --> DEAD[코루틴 유실<br/>never awaited]
+```
+
 핸들러를 `def` 로 내린 것 자체는 의도된 선택이었다 — 동기 DB 드라이버로 블로킹
 쿼리를 하는 핸들러가 커넥션 풀 고갈 시 이벤트 루프를 통째로 얼리는 문제 때문에,
 이런 핸들러들을 `async def` → `def` 로 전환하던 중이었다. 전환 과정에서 본문에 남아
@@ -82,9 +97,27 @@ def approve_order(order_id: int, background_tasks: BackgroundTasks):
     return result
 ```
 
+등록만 하고 즉시 반환하기 때문에, 코루틴이 도는 시점은 **응답이 나간 뒤**다.
+
+```mermaid
+sequenceDiagram
+  participant C as 클라이언트
+  participant L as 루프 스레드
+  participant W as 워커 스레드
+  C->>L: POST 요청
+  L->>W: def 핸들러 오프로드
+  W->>W: approve 실행
+  W->>W: add_task 등록만 (즉시 반환)
+  W-->>L: 반환값
+  L-->>C: 응답 전송 — 여기서 체감 응답 끝
+  L->>W: 응답 후 백그라운드 실행
+  W->>W: asyncio.run 으로 코루틴 완주
+```
+
 **버린 대안 — 핸들러 안에서 직접 `asyncio.run(notify(result))`.** 스레드풀 스레드라
 새 루프를 열어 돌릴 수는 있다. 하지만 그러면 알림이 끝날 때까지 응답이 블로킹된다.
-fire-and-forget 의 의미가 사라진다.
+위 그림에서 마지막 두 줄이 `응답 전송` **앞으로** 당겨지는 셈이다. fire-and-forget 의
+의미가 사라진다.
 
 **한 가지 주의 — 응답을 커스텀 `Response` 객체로 반환하는 경우.** 데코레이터 등이
 핸들러 반환값을 `JSONResponse` 로 감싸 돌려줘도 이 방식은 동작한다. FastAPI 가 라우팅
@@ -166,6 +199,19 @@ Starlette/ASGI 는 이 위험을 핸들러 선언 방식으로 가른다.
 얌전히 있던 `create_task` 는 아무 경고 없이 실행 위치가 루프 밖으로 바뀌어 깨진다.
 리팩터링이 유발하는 이런 "위치 의존 버그"는 타입 체커도 못 잡는다 — 그래서 해결에서
 AST 린트로 못을 박은 것이다.
+
+말로 읽는 것보다 한 번 돌려보는 쪽이 빠르다. 핸들러 선언과 후처리 호출을 바꿔가며
+**재생**을 눌러보면, 코루틴이 어느 스레드에서 도는지 · 언제 죽는지 · 응답이 언제
+나가는지가 타임라인 위에서 그대로 보인다.
+
+{% include codex/asyncio-create-task-in-sync-handler.html %}
+
+여섯 조합을 요약하면 이렇다. `create_task` 는 **루프 위에서만** 살고, `asyncio.run` 은
+**루프 밖에서만** 살되 블로킹을 대가로 치른다. 응답 블로킹 없이 코루틴을 실제로
+완주시키는 조합은 `BackgroundTasks` 쪽 둘뿐이다. 한 가지 더 — `async def` + `create_task`
+는 동작하지만, 루프가 태스크를 **약한 참조로만** 붙들기 때문에 반환된 태스크 객체를
+아무도 들고 있지 않으면 완료 전에 GC 될 수 있다. 루프 위라고 fire-and-forget 이
+공짜인 건 아니다.
 
 (참고로 스레드풀 오프로드에는 anyio 의 `CapacityLimiter` 로 동시 실행 상한이 걸린다.
 즉 `def` 로 내린다고 무한 병렬이 되는 게 아니라, 스레드 자원 안에서 관리된다.)
