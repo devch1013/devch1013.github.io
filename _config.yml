@@ -189,6 +189,7 @@ highlighter : rouge
 permalink   : date
 
 exclude:
+  - CLAUDE.md # 저장소 작업 지침 — 사이트로 나가면 안 된다
   - CHANGELOG.md
   - HOW_TO_RELEASE.md
   - Gemfile
