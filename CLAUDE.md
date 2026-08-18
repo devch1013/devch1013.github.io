@@ -80,7 +80,18 @@ mathjax: true   # $$...$$
 `_includes/markdown-enhancements/*.html` lazy-loads each library from `_data/variables.yml` `sources`. The pinned versions are old and constrain the syntax:
 
 - **mermaid `8.0.0-rc.8`** — its `detectType` matches exactly four keywords (`sequenceDiagram`, `gantt`, `classDiagram`, `gitGraph`) and sends **everything else to the flowchart parser**. So the usable set is `graph`/`flowchart`, `sequenceDiagram`, `classDiagram`, `gantt`, `gitGraph` — and `stateDiagram`, `erDiagram`, `journey`, `pie`, `mindmap`, `timeline` don't degrade gracefully, they hit the flowchart grammar and fail to render. Draw state transitions as `graph LR`; use a table for proportions.
+- **mermaid `8.0.0-rc.8` — do not use `subgraph`.** The `subgraph id["title"]` form is a **parse** error (that syntax postdates this build), and the older bare `subgraph title` form *parses* but then **fails during render**, emitting an empty `<svg>`. Worse, `mermaid.init` walks the blocks in order and a render throw **aborts the rest of the page**, so one `subgraph` silently kills every diagram after it. Express grouping in the node labels instead (put the shared key in each label, e.g. `A["A · pgid 100"]`).
 - **Chart.js `2.7.2`** — v2 config schema, so axes are `"scales": {"yAxes": [...]}`, not the v3+ flat form.
+
+**Verify diagrams by rendering, not by parsing.** `mermaidAPI.parse()` passing proves nothing about render — `subgraph` clears parse and dies in the renderer. Headless-render the built page and assert every block produced nodes:
+
+```bash
+bundle exec jekyll build && (cd _site && python3 -m http.server 4399 &)
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --disable-gpu \
+  --virtual-time-budget=40000 --dump-dom http://localhost:4399/codex/<slug>.html > /tmp/r.html
+# 각 <code class="language-mermaid"> 안에 <svg> 와 <g class="node"> 가 있어야 한다.
+# 원본 'graph TD' 텍스트가 그대로 남아 있으면 그 블록은 렌더되지 않은 것이다.
+```
 
 The site ships a single light skin (`text_skin: default`, `#fff` background), so visuals don't need dark-mode variants.
 
