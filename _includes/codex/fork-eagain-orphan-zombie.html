@@ -1,0 +1,458 @@
+<div class="cdxpid" data-cdxpid>
+<style>
+.cdxpid {
+  --ok:#1c7a44; --ok-s:#e3f4e9;
+  --warn:#99650a; --warn-s:#fdf1dd;
+  --err:#c0292c; --err-s:#fde8e8;
+  --line:rgba(0,0,0,.13); --line-2:rgba(0,0,0,.24);
+  --muted:#8a8a8a; --ink:#222; --ink-2:#4a5560;
+  --surface:#fafafa; --spawn:#4f5bab; --zomb:#5a4a5f;
+  border:1px solid var(--line-2);
+  border-radius:12px;
+  margin:1.8rem 0;
+  overflow:hidden;
+  font-size:.93rem;
+  line-height:1.6;
+  background:#fff;
+}
+.cdxpid * { box-sizing:border-box; }
+
+/* ---------- controls ---------- */
+.cdxpid .cdxpid-ctrls {
+  display:flex; align-items:center; gap:.5rem; flex-wrap:wrap;
+  padding:.85rem 1rem; border-bottom:1px solid var(--line); background:var(--surface);
+}
+.cdxpid .cdxpid-seg { display:inline-flex; border:1px solid var(--line-2); border-radius:8px; overflow:hidden; }
+.cdxpid .cdxpid-seg button {
+  font-family:Menlo,Consolas,monospace; font-size:.7rem; font-weight:600;
+  border:0; cursor:pointer; padding:.5rem .65rem; background:transparent; color:var(--muted);
+  transition:background .15s, color .15s;
+}
+.cdxpid .cdxpid-seg button + button { border-left:1px solid var(--line); }
+.cdxpid .cdxpid-seg button:hover { background:rgba(0,0,0,.04); color:var(--ink); }
+.cdxpid .cdxpid-seg button[aria-pressed="true"] { background:#fc4d50; color:#fff; }
+.cdxpid .cdxpid-btn {
+  font-family:Menlo,Consolas,monospace; font-size:.7rem; font-weight:600; cursor:pointer;
+  padding:.5rem .7rem; border-radius:8px; border:1px solid var(--line-2);
+  background:#fff; color:var(--ink); transition:background .15s;
+}
+.cdxpid .cdxpid-btn:hover { background:rgba(0,0,0,.04); }
+.cdxpid button:focus-visible { outline:2px solid #fc4d50; outline-offset:2px; }
+.cdxpid .cdxpid-status {
+  margin-left:auto; font-family:Menlo,Consolas,monospace; font-size:.7rem; font-weight:700;
+  padding:.3rem .7rem; border-radius:999px; border:1px solid var(--line-2); color:var(--muted);
+  white-space:nowrap;
+}
+.cdxpid .cdxpid-status.ok  { color:var(--ok);  border-color:var(--ok);  background:var(--ok-s); }
+.cdxpid .cdxpid-status.err { color:var(--err); border-color:var(--err); background:var(--err-s); }
+
+/* ---------- stage ---------- */
+.cdxpid .cdxpid-stage { padding:1.1rem 1rem .6rem; }
+.cdxpid .cdxpid-lane { display:flex; align-items:center; gap:.7rem; margin-bottom:.4rem; }
+.cdxpid .cdxpid-lane-name {
+  flex:none; width:10.4rem; font-family:Menlo,Consolas,monospace; font-size:.64rem;
+  color:var(--muted); text-align:right; line-height:1.3;
+}
+.cdxpid .cdxpid-lane-name b { display:block; color:var(--ink-2); font-size:.71rem; font-weight:600; }
+.cdxpid .cdxpid-track {
+  position:relative; flex:1; height:34px; border:1px dashed var(--line-2);
+  border-radius:7px; background:var(--surface); overflow:hidden;
+}
+.cdxpid .cdxpid-blk {
+  position:absolute; top:4px; bottom:4px; border-radius:5px;
+  display:flex; align-items:center; padding:0 .45rem; overflow:hidden;
+  font-family:Menlo,Consolas,monospace; font-size:.62rem; font-weight:600;
+  white-space:nowrap; color:#fff; transition:width .1s linear;
+}
+.cdxpid .cdxpid-blk.spawn  { background:var(--spawn); }
+.cdxpid .cdxpid-blk.run    { background:#4a5560; }
+.cdxpid .cdxpid-blk.orphan { background:var(--err); }
+.cdxpid .cdxpid-blk.zombie {
+  background:repeating-linear-gradient(135deg,var(--zomb) 0 5px,#8d7d92 5px 10px);
+}
+.cdxpid .cdxpid-bang { position:absolute; top:0; bottom:0; width:3px; background:var(--err); }
+.cdxpid .cdxpid-bang::after {
+  content:"\2715"; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  color:var(--err); font-size:.8rem; font-weight:700;
+  background:#fff; border:1.5px solid var(--err); border-radius:50%;
+  width:1.05rem; height:1.05rem; display:flex; align-items:center; justify-content:center;
+}
+
+/* ---------- pid slots ---------- */
+.cdxpid .cdxpid-slots { display:flex; height:22px; gap:3px; }
+.cdxpid .cdxpid-slot { flex:1; border-radius:3px; background:#eef0f1; border:1px solid var(--line); transition:background .12s linear; }
+.cdxpid .cdxpid-slot.used   { background:#4a5560; border-color:#4a5560; }
+.cdxpid .cdxpid-slot.orphan { background:var(--err); border-color:var(--err); }
+.cdxpid .cdxpid-slot.zombie {
+  background:repeating-linear-gradient(135deg,var(--zomb) 0 4px,#8d7d92 4px 8px); border-color:var(--zomb);
+}
+.cdxpid .cdxpid-slots-wrap { flex:1; }
+.cdxpid .cdxpid-legend {
+  font-family:Menlo,Consolas,monospace; font-size:.6rem; color:var(--muted);
+  margin-top:.2rem; display:flex; gap:.9rem; flex-wrap:wrap;
+}
+.cdxpid .cdxpid-legend i { font-style:normal; display:inline-flex; align-items:center; gap:.28rem; }
+.cdxpid .cdxpid-legend i::before { content:""; width:.6rem; height:.6rem; border-radius:2px; background:#4a5560; }
+.cdxpid .cdxpid-legend i.o::before { background:var(--err); }
+.cdxpid .cdxpid-legend i.z::before { background:repeating-linear-gradient(135deg,var(--zomb) 0 3px,#8d7d92 3px 6px); }
+.cdxpid .cdxpid-legend i.f::before { background:#eef0f1; border:1px solid var(--line); }
+
+/* ---------- counters ---------- */
+.cdxpid .cdxpid-counts { display:flex; gap:.5rem; flex-wrap:wrap; padding:.6rem 1rem .9rem; }
+.cdxpid .cdxpid-count {
+  font-family:Menlo,Consolas,monospace; font-size:.7rem; font-weight:600;
+  border:1px solid var(--line); border-radius:7px; padding:.35rem .65rem;
+  color:var(--ink-2); background:var(--surface);
+}
+.cdxpid .cdxpid-count b { color:var(--ink); font-size:.85rem; }
+.cdxpid .cdxpid-count.bad { border-color:var(--err); color:var(--err); background:var(--err-s); }
+.cdxpid .cdxpid-count.bad b { color:var(--err); }
+.cdxpid .cdxpid-count.good { border-color:var(--ok); color:var(--ok); background:var(--ok-s); }
+.cdxpid .cdxpid-count.good b { color:var(--ok); }
+
+/* ---------- verdict ---------- */
+.cdxpid .cdxpid-verdict { padding:.9rem 1rem 1.1rem; border-top:1px solid var(--line); background:var(--surface); }
+.cdxpid .cdxpid-verdict p { margin:.45rem 0; font-size:.86rem; color:var(--ink-2); }
+.cdxpid .cdxpid-verdict p:first-of-type { margin-top:.6rem; }
+.cdxpid .cdxpid-verdict code {
+  font-family:Menlo,Consolas,monospace; font-size:.8rem;
+  background:rgba(0,0,0,.05); padding:.08rem .3rem; border-radius:3px;
+}
+.cdxpid .cdxpid-log {
+  font-family:Menlo,Consolas,monospace; font-size:.71rem; white-space:pre-wrap;
+  color:var(--err); background:var(--err-s); border:1px solid var(--err);
+  border-radius:6px; padding:.5rem .65rem; margin-top:.6rem !important;
+}
+
+/* ---------- no-JS fallback ---------- */
+.cdxpid .cdxpid-static { padding:.2rem 1rem 1rem; }
+.cdxpid .cdxpid-static table { width:100%; font-size:.78rem; }
+.cdxpid.js .cdxpid-static { display:none; }
+.cdxpid:not(.js) .cdxpid-ctrls,
+.cdxpid:not(.js) .cdxpid-stage,
+.cdxpid:not(.js) .cdxpid-counts,
+.cdxpid:not(.js) .cdxpid-verdict { display:none; }
+
+@media (max-width:640px) {
+  .cdxpid .cdxpid-lane-name { width:100%; text-align:left; }
+  .cdxpid .cdxpid-lane { flex-wrap:wrap; gap:.25rem; }
+}
+</style>
+
+<div class="cdxpid-ctrls">
+  <div class="cdxpid-seg" role="group" aria-label="파이썬 레벨 타임아웃 시 정리 방식">
+    <button type="button" data-a="child" aria-pressed="true">A1 직속 자식만</button>
+    <button type="button" data-a="tree"  aria-pressed="false">A2 트리 kill</button>
+    <button type="button" data-a="sid"   aria-pressed="false">A3 세션분리 + killpg</button>
+  </div>
+  <div class="cdxpid-seg" role="group" aria-label="컨테이너의 PID 1">
+    <button type="button" data-b="app"  aria-pressed="true">B1 PID 1 = 앱</button>
+    <button type="button" data-b="init" aria-pressed="false">B2 PID 1 = init</button>
+  </div>
+  <div class="cdxpid-seg" role="group" aria-label="job 을 끝낸 트리거">
+    <button type="button" data-c="app"   aria-pressed="true">C1 앱 타임아웃</button>
+    <button type="button" data-c="group" aria-pressed="false">C2 외부 그룹 kill</button>
+  </div>
+  <button type="button" class="cdxpid-btn" data-play>&#9654; 재생</button>
+  <button type="button" class="cdxpid-btn" data-reset>&#8634; 리셋</button>
+  <span class="cdxpid-status" data-status>대기</span>
+</div>
+
+<div class="cdxpid-stage">
+  <div class="cdxpid-lane">
+    <div class="cdxpid-lane-name"><b>work horse</b>job 마다 fork, 그룹 리더</div>
+    <div class="cdxpid-track" data-track-horse></div>
+  </div>
+  <div class="cdxpid-lane">
+    <div class="cdxpid-lane-name"><b>서브프로세스</b>python, 직속 자식</div>
+    <div class="cdxpid-track" data-track-sub></div>
+  </div>
+  <div class="cdxpid-lane">
+    <div class="cdxpid-lane-name"><b>드라이버</b>node, 손자</div>
+    <div class="cdxpid-track" data-track-drv></div>
+  </div>
+  <div class="cdxpid-lane">
+    <div class="cdxpid-lane-name"><b>브라우저 10개</b>증손자</div>
+    <div class="cdxpid-track" data-track-br></div>
+  </div>
+  <div class="cdxpid-lane">
+    <div class="cdxpid-lane-name"><b>pid 슬롯 13칸</b>컨테이너의 pid 상한</div>
+    <div class="cdxpid-slots-wrap">
+      <div class="cdxpid-slots" data-slots></div>
+      <div class="cdxpid-legend">
+        <i class="f">비어 있음</i><i>사용 중</i><i class="o">살아있는 고아</i><i class="z">좀비</i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cdxpid-counts">
+  <span class="cdxpid-count">점유 중인 pid <b data-live>0</b> / 13</span>
+  <span class="cdxpid-count" data-leak-box>job 이 끝난 뒤 남은 pid <b data-leak>0</b></span>
+</div>
+
+<div class="cdxpid-verdict" data-verdict></div>
+
+<div class="cdxpid-static">
+  <table>
+    <thead><tr><th>트리거</th><th>정리 방식</th><th>PID 1</th><th>남는 것</th></tr></thead>
+    <tbody>
+      <tr><td>C1 앱 타임아웃</td><td>A1 직속 자식만</td><td>B1 앱</td><td><b>살아있는 고아 11</b></td></tr>
+      <tr><td>C1 앱 타임아웃</td><td>A1 직속 자식만</td><td>B2 init</td><td><b>살아있는 고아 11</b></td></tr>
+      <tr><td>C1 앱 타임아웃</td><td>A2 트리 kill</td><td>B1 앱</td><td>좀비 11</td></tr>
+      <tr><td>C1 앱 타임아웃</td><td>A2 트리 kill</td><td>B2 init</td><td>없음</td></tr>
+      <tr><td>C1 앱 타임아웃</td><td>A3 세션분리 + killpg</td><td>B1 앱</td><td>좀비 11</td></tr>
+      <tr><td>C1 앱 타임아웃</td><td>A3 세션분리 + killpg</td><td>B2 init</td><td>없음</td></tr>
+      <tr><td>C2 외부 그룹 kill</td><td>A1 직속 자식만</td><td>B1 앱</td><td>좀비 12</td></tr>
+      <tr><td>C2 외부 그룹 kill</td><td>A1 직속 자식만</td><td>B2 init</td><td>없음</td></tr>
+      <tr><td>C2 외부 그룹 kill</td><td>A2 트리 kill</td><td>B1 앱</td><td>좀비 12</td></tr>
+      <tr><td>C2 외부 그룹 kill</td><td>A2 트리 kill</td><td>B2 init</td><td>없음</td></tr>
+      <tr><td>C2 외부 그룹 kill</td><td>A3 세션분리 + killpg</td><td>B1 앱</td><td><b>살아있는 고아 12</b></td></tr>
+      <tr><td>C2 외부 그룹 kill</td><td>A3 세션분리 + killpg</td><td>B2 init</td><td><b>살아있는 고아 12</b></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+(function () {
+  var root = document.currentScript.closest('[data-cdxpid]');
+  if (!root) return;
+  root.classList.add('js');
+
+  var TOTAL = 16;                 // 전체 틱 (추상 단위)
+  var CUT = 11;                   // job 이 끝나는 틱
+  var TICK = 190;                 // ms per tick
+  var LANES = ['horse', 'sub', 'drv', 'br'];
+  var SPAWN = { horse: 0, sub: 2, drv: 4, br: 6 };
+  var NPROC = { horse: 1, sub: 1, drv: 1, br: 10 };
+  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // 조합별 스케줄을 통째로 미리 계산한다 (재생헤드가 훑기만 한다).
+  // a: child | tree | sid      — 파이썬 레벨 타임아웃 시 정리 방식
+  // b: app | init              — 컨테이너의 PID 1
+  // c: app | group             — 이번에 job 을 끝낸 트리거
+  function plan(a, b, c) {
+    var p = { fate: {}, segs: {}, slots: [], leak: 0, outcome: 'none', key: '', cut: CUT };
+    var reaps = (b === 'init');   // PID 1 이 입양된 자식을 거두는가
+
+    if (c === 'app') {
+      // 앱이 스스로 타임아웃을 판단한다. work horse 는 살아서 결과를 반환한다.
+      p.fate.horse = 'gone';
+      p.fate.sub = 'gone';                       // 어느 방식이든 직속 자식은 부모가 죽이고 wait 한다
+      if (a === 'child') {                       // 손자는 건드리지 않았다
+        p.fate.drv = 'orphan';
+        p.fate.br = 'orphan';
+      } else {                                   // 자손까지 죽였다 — 거두는 것은 PID 1 의 몫
+        p.fate.drv = reaps ? 'gone' : 'zombie';
+        p.fate.br = reaps ? 'gone' : 'zombie';
+      }
+    } else {
+      // 외부 감독자가 work horse 를 프로세스 그룹째 SIGKILL 한다. 앱의 정리 코드는 실행되지 않는다.
+      p.fate.horse = 'gone';                     // 워커가 wait 한다
+      if (a === 'sid') {                         // 세션을 탈출해 killpg 가 닿지 않는다
+        p.fate.sub = 'orphan';
+        p.fate.drv = 'orphan';
+        p.fate.br = 'orphan';
+      } else {                                   // 그룹 안이라 전부 죽는다
+        p.fate.sub = reaps ? 'gone' : 'zombie';
+        p.fate.drv = reaps ? 'gone' : 'zombie';
+        p.fate.br = reaps ? 'gone' : 'zombie';
+      }
+    }
+
+    // ── 레인별 블록
+    var TAIL = { orphan: '고아 — ppid 1, 살아있음', zombie: '좀비 Z — pid 만 점유' };
+    var SPAWNLABEL = {
+      horse: 'fork + setpgrp',
+      sub: a === 'sid' ? 'Popen + setsid' : 'Popen',
+      drv: '드라이버 기동',
+      br: '브라우저 10개 기동'
+    };
+    var RUNLABEL = { horse: 'job 실행', sub: '브라우저 작업', drv: '드라이버 대기', br: '렌더링' };
+
+    LANES.forEach(function (k) {
+      var s = SPAWN[k], segs = [];
+      segs.push({ start: s, len: 2, kind: 'spawn', label: SPAWNLABEL[k] });
+      segs.push({ start: s + 2, len: CUT - s - 2, kind: 'run', label: RUNLABEL[k] });
+      if (k === 'horse' && c === 'app') {
+        segs.push({ start: CUT, len: TOTAL - CUT, kind: 'run', label: 'TimeoutExpired 처리 후 정상 종료' });
+      } else if (p.fate[k] !== 'gone') {
+        segs.push({ start: CUT, len: TOTAL - CUT, kind: p.fate[k], label: TAIL[p.fate[k]] });
+      }
+      p.segs[k] = segs;
+    });
+
+    // ── pid 슬롯 13칸 (horse 1, sub 1, drv 1, br 10)
+    LANES.forEach(function (k) {
+      for (var i = 0; i < NPROC[k]; i++) {
+        p.slots.push({ spawn: SPAWN[k], fate: p.fate[k] });
+      }
+    });
+
+    p.leak = p.slots.filter(function (s) { return s.fate !== 'gone'; }).length;
+    if (p.slots.some(function (s) { return s.fate === 'orphan'; })) p.outcome = 'orphan';
+    else if (p.slots.some(function (s) { return s.fate === 'zombie'; })) p.outcome = 'zombie';
+    else p.outcome = 'none';
+
+    if (c === 'app') p.key = (a === 'child') ? 'A1' : (reaps ? 'OK1' : 'C1Z');
+    else p.key = (a === 'sid') ? 'A3BAD' : (reaps ? 'OK2' : 'C2Z');
+
+    return p;
+  }
+
+  var ERRLINE = 'BlockingIOError: [Errno 11] Resource temporarily unavailable';
+
+  var VERDICT = {
+    A1: { tone: 'err', html:
+      '<p><b>브라우저 레인이 빨간 채로 끝난다.</b> 파이썬은 직속 자식 하나만 SIGKILL 했고, 드라이버와 브라우저 10개는 아무 일도 없었다는 듯 계속 돌아간다. 바뀐 것은 <code>ppid</code> 가 1 이 된 것뿐이다.</p>' +
+      '<p><code>subprocess.run(timeout=)</code> 이 보장하는 것은 <b>직속 자식 하나</b>의 종료뿐이다. 그래서 PID 1 축을 <code>init</code> 으로 바꿔도 이 칸은 달라지지 않는다 — init 은 <b>거두기만</b> 하지 살아있는 프로세스를 죽이지 않는다.</p>' },
+
+    C1Z: { tone: 'err', html:
+      '<p>레인은 전부 <b>죽었는데</b> pid 슬롯은 하나도 비지 않았다. 자손이 <code>Z</code> 상태로 프로세스 테이블에 남아 번호만 붙들고 있다.</p>' +
+      '<p>정리 코드는 제 일을 다 했다. 문제는 그 뒤다 — 중간 부모가 함께 죽었으므로 시체를 거둘 책임이 PID 1 에게 넘어갔는데, PID 1 이 애플리케이션이라 입양된 자식을 <code>wait()</code> 하지 않는다.</p>' +
+      '<p>이 칸이 <b>정리 코드만으로는 못 고친다</b>는 증거다. 좀비는 메모리도 CPU 도 쓰지 않으므로 지표에도 안 잡힌다.</p>' },
+
+    OK1: { tone: 'ok', html:
+      '<p><b>슬롯이 0 으로 떨어진다.</b> 자손까지 죽였고, 죽은 자리를 init 이 거뒀다. 이 job 은 컨테이너에 아무것도 남기지 않는다.</p>' +
+      '<p>죽이는 쪽(애플리케이션)과 거두는 쪽(PID 1)이 둘 다 있어야 여기 도달한다. 한 축만 고치면 위 두 칸 중 하나로 떨어진다.</p>' },
+
+    C2Z: { tone: 'err', html:
+      '<p>외부 감독자가 work horse 를 <b>프로세스 그룹째</b> SIGKILL 했다. 그룹 안에 있던 자손은 정리 방식과 무관하게 전부 죽는다 — 앱의 정리 코드는 실행조차 되지 않았는데도 그렇다. <code>fork</code> 가 pgid 를 상속하기 때문이다.</p>' +
+      '<p>그래서 <b>A1 과 A2 가 같은 결과를 낸다.</b> 이 트리거에서는 정리 방식이 아무것도 바꾸지 못하고, 남는 것을 가르는 축은 PID 1 하나뿐이다.</p>' },
+
+    OK2: { tone: 'ok', html:
+      '<p>그룹 kill 이 전부 죽였고 init 이 전부 거뒀다. <b>앱 코드는 한 줄도 실행되지 않았다.</b></p>' +
+      '<p><code>SIGKILL</code> 경로에서 애플리케이션이 할 수 있는 일은 없다. 이 구간을 덮는 것은 미리 같은 프로세스 그룹에 묶여 있었다는 사실과, PID 1 이 init 이라는 사실 둘뿐이다.</p>' },
+
+    A3BAD: { tone: 'err', html:
+      '<p><b>이 칸이 세션 분리를 버린 이유다.</b> 서브프로세스가 새 세션으로 빠져나가 work horse 그룹 밖에 있으므로 감독자의 <code>killpg</code> 가 닿지 않는다. horse 만 죽고 그 아래는 통째로 살아남는다.</p>' +
+      '<p>앱 타임아웃 축에서는 이 방식이 멀쩡해 보인다. 트리거를 C2 로 바꾸는 순간 최악이 되고, <b>C2 는 앱이 개입할 수 없는 경로다.</b> PID 1 을 init 으로 바꿔도 소용없다 — 살아있는 것은 거둘 대상이 아니다.</p>' }
+  };
+
+  var els = {
+    horse:   root.querySelector('[data-track-horse]'),
+    sub:     root.querySelector('[data-track-sub]'),
+    drv:     root.querySelector('[data-track-drv]'),
+    br:      root.querySelector('[data-track-br]'),
+    slots:   root.querySelector('[data-slots]'),
+    live:    root.querySelector('[data-live]'),
+    leak:    root.querySelector('[data-leak]'),
+    leakBox: root.querySelector('[data-leak-box]'),
+    verdict: root.querySelector('[data-verdict]'),
+    status:  root.querySelector('[data-status]'),
+    play:    root.querySelector('[data-play]'),
+    reset:   root.querySelector('[data-reset]')
+  };
+
+  var a = 'child', b = 'app', c = 'app', p = plan(a, b, c), t = 0, timer = null;
+
+  function badge() {
+    if (p.outcome === 'orphan') return '✕ 살아있는 고아 ' + p.leak + '개';
+    if (p.outcome === 'zombie') return '✕ 좀비 ' + p.leak + '개';
+    return '✓ 남은 것 없음';
+  }
+
+  function setStatus(txt, cls) {
+    els.status.textContent = txt;
+    els.status.className = 'cdxpid-status' + (cls ? ' ' + cls : '');
+  }
+
+  function pct(n) { return (n / TOTAL * 100) + '%'; }
+
+  function slotState(s, tick) {
+    if (tick <= s.spawn) return '';
+    if (tick <= CUT) return 'used';
+    return s.fate === 'gone' ? '' : s.fate;
+  }
+
+  function render() {
+    LANES.forEach(function (k) {
+      var html = '';
+      p.segs[k].forEach(function (g) {
+        var shown = Math.max(0, Math.min(t - g.start, g.len));
+        if (shown <= 0) return;
+        html += '<div class="cdxpid-blk ' + g.kind + '" style="left:' + pct(g.start) +
+                ';width:' + pct(shown) + '">' + g.label + '</div>';
+      });
+      var died = (k === 'horse') ? (c === 'group') : (p.fate[k] !== 'orphan');
+      if (died && t > CUT) html += '<div class="cdxpid-bang" style="left:' + pct(CUT) + '"></div>';
+      els[k].innerHTML = html;
+    });
+
+    var sh = '', live = 0;
+    p.slots.forEach(function (s) {
+      var st = slotState(s, t);
+      if (st) live++;
+      sh += '<div class="cdxpid-slot ' + st + '"></div>';
+    });
+    els.slots.innerHTML = sh;
+
+    els.live.textContent = live;
+    var leakNow = (t > CUT) ? p.leak : 0;
+    els.leak.textContent = leakNow;
+    els.leakBox.className = 'cdxpid-count' +
+      (t > CUT ? (leakNow ? ' bad' : ' good') : '');
+  }
+
+  function renderVerdict() {
+    var v = VERDICT[p.key];
+    var done = t >= TOTAL;
+    els.verdict.innerHTML =
+      '<span class="cdxpid-status ' + v.tone + '" style="margin:0">' + badge() + '</span>' +
+      v.html +
+      (done && p.leak ? '<p class="cdxpid-log">남은 pid ' + p.leak +
+        '개 × 20분마다 반복 → ' + ERRLINE + '</p>' : '');
+  }
+
+  function stop() {
+    if (timer) { clearInterval(timer); timer = null; }
+    els.play.textContent = '▶ 재생';
+  }
+
+  function reset() {
+    stop();
+    p = plan(a, b, c);
+    t = 0;
+    render();
+    renderVerdict();
+    setStatus('대기', '');
+  }
+
+  function finish() {
+    stop();
+    setStatus(badge(), VERDICT[p.key].tone);
+    renderVerdict();
+  }
+
+  function play() {
+    if (timer) { stop(); setStatus('일시정지', ''); return; }
+    if (t >= TOTAL) t = 0;
+    if (reduced) { t = TOTAL; render(); finish(); return; }
+    els.play.textContent = '❙❙ 일시정지';
+    setStatus('재생 중…', '');
+    timer = setInterval(function () {
+      t++;
+      render();
+      renderVerdict();
+      if (t >= TOTAL) finish();
+    }, TICK);
+  }
+
+  root.querySelectorAll('[data-a],[data-b],[data-c]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.hasAttribute('data-a') ? 'data-a' : (btn.hasAttribute('data-b') ? 'data-b' : 'data-c');
+      root.querySelectorAll('[' + key + ']').forEach(function (o) {
+        o.setAttribute('aria-pressed', String(o === btn));
+      });
+      var val = btn.getAttribute(key);
+      if (key === 'data-a') a = val; else if (key === 'data-b') b = val; else c = val;
+      reset();
+    });
+  });
+  els.play.addEventListener('click', play);
+  els.reset.addEventListener('click', reset);
+
+  reset();
+})();
+</script>
+</div>
