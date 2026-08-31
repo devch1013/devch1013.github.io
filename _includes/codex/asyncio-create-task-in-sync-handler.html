@@ -1,398 +1,141 @@
-<div class="cdxls" data-cdxls>
+<figure class="cdxslot">
 <style>
-.cdxls {
-  --ok:#1c7a44; --ok-s:#e3f4e9;
-  --warn:#99650a; --warn-s:#fdf1dd;
-  --err:#c0292c; --err-s:#fde8e8;
-  --line:rgba(0,0,0,.13); --line-2:rgba(0,0,0,.24);
-  --muted:#8a8a8a; --ink:#222; --ink-2:#4a5560;
-  --surface:#fafafa;
-  border:1px solid var(--line-2);
-  border-radius:12px;
-  margin:1.8rem 0;
-  overflow:hidden;
-  font-size:.93rem;
-  line-height:1.6;
-  background:#fff;
+.cdxslot {
+  --loop:#1a6b57; --loop-s:#e8f2ef;
+  --dead:#a8322f; --dead-s:#fbeceb;
+  --temp:#8a6a12; --temp-s:#fbf3df;
+  --defer:#3a55a0; --defer-s:#eaeefa;
+  --wall:#6f7780; --ink:#242a2f;
+  margin:1.9rem 0;
+  padding:0;
 }
-.cdxls * { box-sizing:border-box; }
-
-/* ---------- controls ---------- */
-.cdxls .cdxls-ctrls {
-  display:flex; align-items:center; gap:.5rem; flex-wrap:wrap;
-  padding:.85rem 1rem; border-bottom:1px solid var(--line); background:var(--surface);
+.cdxslot .cdxslot-scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.cdxslot .cdxslot-svg {
+  display:block;
+  width:100%;
+  min-width:740px;
+  height:auto;
+  font-family:inherit;
+  color:var(--ink);
 }
-.cdxls .cdxls-seg { display:inline-flex; border:1px solid var(--line-2); border-radius:8px; overflow:hidden; }
-.cdxls .cdxls-seg button {
-  font-family:Menlo,Consolas,monospace; font-size:.76rem; font-weight:600;
-  border:0; cursor:pointer; padding:.5rem .8rem; background:transparent; color:var(--muted);
-  transition:background .15s, color .15s;
+.cdxslot .cdxslot-mono { font-family:Menlo,Consolas,"Liberation Mono",monospace; }
+.cdxslot .cdxslot-cap {
+  margin:.75rem .1rem 0;
+  font-size:.86rem;
+  line-height:1.65;
+  color:#4a5560;
 }
-.cdxls .cdxls-seg button + button { border-left:1px solid var(--line); }
-.cdxls .cdxls-seg button:hover { background:rgba(0,0,0,.04); color:var(--ink); }
-.cdxls .cdxls-seg button[aria-pressed="true"] { background:#fc4d50; color:#fff; }
-.cdxls .cdxls-btn {
-  font-family:Menlo,Consolas,monospace; font-size:.76rem; font-weight:600; cursor:pointer;
-  padding:.5rem .8rem; border-radius:8px; border:1px solid var(--line-2);
-  background:#fff; color:var(--ink); transition:background .15s;
+.cdxslot .cdxslot-cap b { color:var(--ink); font-weight:600; }
+.cdxslot .cdxslot-cap code {
+  font-family:Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:.82em;
 }
-.cdxls .cdxls-btn:hover { background:rgba(0,0,0,.04); }
-.cdxls button:focus-visible { outline:2px solid #fc4d50; outline-offset:2px; }
-.cdxls .cdxls-status {
-  margin-left:auto; font-family:Menlo,Consolas,monospace; font-size:.72rem; font-weight:700;
-  padding:.3rem .7rem; border-radius:999px; border:1px solid var(--line-2); color:var(--muted);
-  white-space:nowrap;
-}
-.cdxls .cdxls-status.ok   { color:var(--ok);   border-color:var(--ok);   background:var(--ok-s); }
-.cdxls .cdxls-status.warn { color:var(--warn); border-color:var(--warn); background:var(--warn-s); }
-.cdxls .cdxls-status.err  { color:var(--err);  border-color:var(--err);  background:var(--err-s); }
-
-/* ---------- stage ---------- */
-.cdxls .cdxls-stage { padding:1.1rem 1rem .4rem; }
-.cdxls .cdxls-lane { display:flex; align-items:center; gap:.7rem; margin-bottom:.5rem; }
-.cdxls .cdxls-lane-name {
-  flex:none; width:8.4rem; font-family:Menlo,Consolas,monospace; font-size:.7rem;
-  color:var(--muted); text-align:right; line-height:1.3;
-}
-.cdxls .cdxls-lane-name b { display:block; color:var(--ink-2); font-size:.74rem; font-weight:600; }
-.cdxls .cdxls-track {
-  position:relative; flex:1; height:38px; border:1px dashed var(--line-2);
-  border-radius:7px; background:var(--surface); overflow:hidden;
-}
-.cdxls .cdxls-track.dead { opacity:.5; }
-
-.cdxls .cdxls-blk {
-  position:absolute; top:5px; bottom:5px; border-radius:5px;
-  display:flex; align-items:center; padding:0 .5rem; overflow:hidden;
-  font-family:Menlo,Consolas,monospace; font-size:.68rem; font-weight:600;
-  white-space:nowrap; color:#fff; transition:width .1s linear;
-}
-.cdxls .cdxls-blk.handler { background:#4a5560; }
-.cdxls .cdxls-blk.coro    { background:var(--ok); }
-.cdxls .cdxls-blk.idle {
-  background:repeating-linear-gradient(135deg,rgba(0,0,0,.05) 0 6px,transparent 6px 12px);
-  color:var(--muted); border:1px solid var(--line);
-}
-.cdxls .cdxls-blk.boom { background:var(--err); }
-
-.cdxls .cdxls-bang {
-  position:absolute; top:0; bottom:0; width:3px; background:var(--err);
-}
-.cdxls .cdxls-bang::after {
-  content:"✕"; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-  color:var(--err); font-size:.9rem; font-weight:700;
-  background:#fff; border:1.5px solid var(--err); border-radius:50%;
-  width:1.15rem; height:1.15rem; display:flex; align-items:center; justify-content:center;
-}
-
-/* response marker */
-.cdxls .cdxls-axis { display:flex; gap:.7rem; margin-top:.1rem; }
-.cdxls .cdxls-axis-pad { flex:none; width:8.4rem; }
-.cdxls .cdxls-axis-track { position:relative; flex:1; height:1.55rem; }
-.cdxls .cdxls-resp { position:absolute; top:0; transform:translateX(-50%); text-align:center; transition:left .1s linear; }
-.cdxls .cdxls-resp i {
-  display:block; width:2px; height:.45rem; background:#fc4d50; margin:0 auto;
-}
-.cdxls .cdxls-resp span {
-  display:inline-block; font-family:Menlo,Consolas,monospace; font-size:.65rem; font-weight:700;
-  color:#fff; background:#fc4d50; border-radius:3px; padding:.1rem .4rem; white-space:nowrap;
-}
-.cdxls .cdxls-resp.err i, .cdxls .cdxls-resp.err span { background:var(--err); }
-.cdxls .cdxls-resp.pending { opacity:.28; }
-
-/* playhead */
-.cdxls .cdxls-head {
-  position:absolute; top:0; bottom:0; width:1px; background:rgba(0,0,0,.35);
-  transition:left .1s linear; pointer-events:none;
-}
-
-/* ---------- stats ---------- */
-.cdxls .cdxls-stats {
-  display:grid; grid-template-columns:repeat(3,1fr); gap:1px;
-  background:var(--line); border-top:1px solid var(--line); margin-top:.7rem;
-}
-.cdxls .cdxls-stat { background:#fff; padding:.6rem .9rem; }
-.cdxls .cdxls-stat .k {
-  font-family:Menlo,Consolas,monospace; font-size:.62rem; letter-spacing:.06em;
-  text-transform:uppercase; color:var(--muted);
-}
-.cdxls .cdxls-stat .v { font-size:1rem; font-weight:700; margin-top:.1rem; color:var(--ink); }
-.cdxls .cdxls-stat .v.ok { color:var(--ok); }
-.cdxls .cdxls-stat .v.warn { color:var(--warn); }
-.cdxls .cdxls-stat .v.err { color:var(--err); }
-
-/* ---------- verdict ---------- */
-.cdxls .cdxls-verdict { padding:.9rem 1rem 1rem; border-top:1px solid var(--line); }
-.cdxls .cdxls-tag {
-  display:inline-block; font-family:Menlo,Consolas,monospace; font-size:.65rem; font-weight:700;
-  border:1px solid var(--line-2); border-radius:3px; padding:.05rem .45rem; color:#666; margin-left:.3rem;
-}
-.cdxls .cdxls-verdict p { margin:.45rem 0 0; color:var(--ink-2); font-size:.9rem; }
-.cdxls .cdxls-verdict p:first-child { margin-top:0; }
-.cdxls .cdxls-verdict b { color:var(--ink); }
-.cdxls code {
-  font-family:Menlo,Consolas,monospace; font-size:.84em;
-  background:rgba(0,0,0,.05); padding:.08em .35em; border-radius:3px;
-}
-.cdxls .cdxls-log {
-  margin:.6rem 0 0; padding:.5rem .7rem; background:var(--err-s);
-  border-left:3px solid var(--err); border-radius:0 4px 4px 0;
-  font-family:Menlo,Consolas,monospace; font-size:.73rem; color:#8d2124;
-  white-space:pre-wrap; word-break:break-word;
-}
-.cdxls .cdxls-legend {
-  display:flex; gap:.9rem; flex-wrap:wrap; margin-top:.6rem;
-  font-family:Menlo,Consolas,monospace; font-size:.66rem; color:var(--muted);
-}
-.cdxls .cdxls-legend span { display:inline-flex; align-items:center; gap:.3rem; }
-.cdxls .cdxls-legend i { width:.6rem; height:.6rem; border-radius:2px; }
-
-@media (max-width:560px) {
-  .cdxls .cdxls-lane-name, .cdxls .cdxls-axis-pad { width:5.2rem; font-size:.62rem; }
-  .cdxls .cdxls-stats { grid-template-columns:1fr; }
-  .cdxls .cdxls-status { margin-left:0; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .cdxls .cdxls-blk, .cdxls .cdxls-head, .cdxls .cdxls-resp { transition:none; }
-}
-
-/* JS 없으면 시뮬레이터 대신 정적 표 */
-.cdxls .cdxls-nojs { padding:.9rem 1rem 1rem; }
-.cdxls .cdxls-nojs table { width:100%; border-collapse:collapse; font-size:.82rem; }
-.cdxls .cdxls-nojs th, .cdxls .cdxls-nojs td { text-align:left; padding:.4rem .5rem; border-bottom:1px solid var(--line); }
-.cdxls .cdxls-nojs th { font-family:Menlo,Consolas,monospace; font-size:.68rem; color:var(--muted); text-transform:uppercase; }
-.cdxls.js .cdxls-nojs { display:none; }
-.cdxls:not(.js) .cdxls-ctrls,
-.cdxls:not(.js) .cdxls-stage,
-.cdxls:not(.js) .cdxls-stats,
-.cdxls:not(.js) .cdxls-verdict { display:none; }
 </style>
 
-<div class="cdxls-ctrls">
-  <div class="cdxls-seg" role="group" aria-label="핸들러 선언">
-    <button type="button" data-h="async" aria-pressed="true">async def</button>
-    <button type="button" data-h="sync" aria-pressed="false">def</button>
-  </div>
-  <div class="cdxls-seg" role="group" aria-label="후처리 호출">
-    <button type="button" data-m="task" aria-pressed="true">create_task()</button>
-    <button type="button" data-m="run" aria-pressed="false">asyncio.run()</button>
-    <button type="button" data-m="bg" aria-pressed="false">BackgroundTasks</button>
-  </div>
-  <button type="button" class="cdxls-btn" data-play>▶ 재생</button>
-  <button type="button" class="cdxls-btn" data-reset>↺ 리셋</button>
-  <span class="cdxls-status" data-status>대기</span>
+<div class="cdxslot-scroll">
+<svg class="cdxslot-svg" viewBox="0 0 800 416" role="img"
+     aria-labelledby="cdxslot-t cdxslot-d" preserveAspectRatio="xMidYMid meet">
+  <title id="cdxslot-t">스레드마다 하나씩 있는 &ldquo;도는 루프 자리&rdquo; 단면도</title>
+  <desc id="cdxslot-d">왼쪽은 이벤트 루프 스레드로, 루프 자리가 도는 이벤트 루프로 채워져 있어 asyncio.create_task 가 코루틴을 태스크로 등록한다. 오른쪽은 def 핸들러가 오프로드되는 anyio 워커 스레드로, 루프 자리가 비어 있다. 그 자리를 읽기만 하는 create_task 는 RuntimeError 로 막히고 코루틴은 never awaited 로 사라진다. asyncio.run 은 임시 루프를 만들어 그 자리에 꽂아 완주시키지만 그동안 응답이 나가지 못한다. BackgroundTasks 는 그 자리를 아예 보지 않고, 응답이 나간 뒤에 실행하도록 시점만 옮긴다.</desc>
+
+  <defs>
+    <marker id="cdxslot-ar-loop" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a6b57"/>
+    </marker>
+    <marker id="cdxslot-ar-dead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#a8322f"/>
+    </marker>
+    <marker id="cdxslot-ar-temp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#8a6a12"/>
+    </marker>
+    <marker id="cdxslot-ar-defer" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#3a55a0"/>
+    </marker>
+  </defs>
+
+  <!-- ============ 왼쪽 방 : 이벤트 루프 스레드 ============ -->
+  <g class="cdxslot-room">
+    <rect x="8" y="8" width="252" height="400" rx="12" fill="#fdfdfc" stroke="#c9ced4"/>
+    <text x="24" y="36" font-size="14.5" font-weight="700" fill="#242a2f">이벤트 루프 스레드</text>
+    <text x="24" y="55" font-size="11.5" fill="#6f7780">async def 핸들러가 여기서 실행</text>
+    <line x1="24" y1="68" x2="244" y2="68" stroke="#e2e5e8"/>
+
+    <rect x="24" y="84" width="220" height="32" rx="7" fill="#ffffff" stroke="#cfd4d8"/>
+    <text class="cdxslot-mono" x="134" y="105" font-size="11.5" text-anchor="middle" fill="#242a2f">asyncio.create_task(coro)</text>
+
+    <line x1="134" y1="118" x2="134" y2="156" stroke="#1a6b57" stroke-width="1.8" marker-end="url(#cdxslot-ar-loop)"/>
+
+    <rect x="30" y="162" width="208" height="104" rx="12" fill="#e8f2ef" stroke="#1a6b57" stroke-width="1.6"/>
+    <text x="134" y="185" font-size="11" text-anchor="middle" fill="#6f7780">이 스레드의 루프 자리</text>
+    <rect x="46" y="196" width="176" height="40" rx="8" fill="#1a6b57"/>
+    <text x="134" y="221" font-size="12.5" font-weight="600" text-anchor="middle" fill="#ffffff">도는 이벤트 루프</text>
+    <text class="cdxslot-mono" x="134" y="254" font-size="10.5" text-anchor="middle" fill="#1a6b57">get_running_loop() → OK</text>
+
+    <text x="24" y="292" font-size="11.5" font-weight="600" fill="#1a6b57">자리를 읽는다 → 태스크로 등록</text>
+    <text x="24" y="310" font-size="11" fill="#4a5560">루프가 이 코루틴도 함께 굴린다</text>
+
+    <text x="24" y="340" font-size="10.5" fill="#6f7780">단, 루프는 태스크를 약한 참조로 붙든다.</text>
+    <text x="24" y="356" font-size="10.5" fill="#6f7780">반환값을 안 들고 있으면 GC 될 수 있다.</text>
+  </g>
+
+  <!-- ============ 오른쪽 방 : anyio 워커 스레드 ============ -->
+  <g class="cdxslot-room">
+    <rect x="276" y="8" width="516" height="400" rx="12" fill="#fdfdfc" stroke="#c9ced4"/>
+    <text x="292" y="36" font-size="14.5" font-weight="700" fill="#242a2f">anyio 워커 스레드</text>
+    <text x="292" y="55" font-size="11.5" fill="#6f7780">def 핸들러가 여기서 실행 — 블로킹 대비 오프로드</text>
+    <line x1="292" y1="68" x2="776" y2="68" stroke="#e2e5e8"/>
+
+    <!-- 이 방의 루프 자리 : 비어 있음 -->
+    <rect x="610" y="84" width="166" height="92" rx="12" fill="#ffffff" stroke="#6f7780" stroke-width="1.6" stroke-dasharray="5 4"/>
+    <text x="693" y="107" font-size="11" text-anchor="middle" fill="#6f7780">이 스레드의 루프 자리</text>
+    <text x="693" y="134" font-size="15" font-weight="700" text-anchor="middle" fill="#a8322f">비어 있음</text>
+    <text class="cdxslot-mono" x="693" y="157" font-size="10.5" text-anchor="middle" fill="#a8322f">get_running_loop() ✕</text>
+
+    <!-- run 이 만들어 꽂는 임시 루프 -->
+    <rect x="610" y="208" width="166" height="40" rx="8" fill="#8a6a12"/>
+    <text x="693" y="233" font-size="11.5" font-weight="600" text-anchor="middle" fill="#ffffff">임시 루프 — run 이 만듦</text>
+    <line x1="693" y1="206" x2="693" y2="182" stroke="#8a6a12" stroke-width="1.8" marker-end="url(#cdxslot-ar-temp)"/>
+    <text x="701" y="199" font-size="10" fill="#8a6a12">자리에 꽂는다</text>
+
+    <!-- 응답 이후로 미뤄지는 실행 -->
+    <rect x="610" y="288" width="166" height="48" rx="10" fill="#eaeefa" stroke="#3a55a0" stroke-width="1.6" stroke-dasharray="5 4"/>
+    <text x="693" y="309" font-size="11.5" font-weight="700" text-anchor="middle" fill="#3a55a0">응답이 나간 뒤</text>
+    <text x="693" y="327" font-size="10.5" text-anchor="middle" fill="#3a55a0">루프가 다시 워커로 보냄</text>
+    <line x1="693" y1="286" x2="693" y2="256" stroke="#3a55a0" stroke-width="1.8" stroke-dasharray="4 3" marker-end="url(#cdxslot-ar-defer)"/>
+    <text x="701" y="275" font-size="10" fill="#3a55a0">그때 완주</text>
+
+    <!-- 갈래 1 : create_task -->
+    <rect x="292" y="84" width="264" height="30" rx="7" fill="#fbeceb" stroke="#a8322f" stroke-width="1.2"/>
+    <text class="cdxslot-mono" x="302" y="104" font-size="11.5" fill="#242a2f">asyncio.create_task(coro)</text>
+    <line x1="558" y1="99" x2="592" y2="114" stroke="#a8322f" stroke-width="1.8" marker-end="url(#cdxslot-ar-dead)"/>
+    <circle cx="606" cy="120" r="9.5" fill="#ffffff" stroke="#a8322f" stroke-width="1.6"/>
+    <text x="606" y="124" font-size="11" font-weight="700" text-anchor="middle" fill="#a8322f">✕</text>
+    <text x="292" y="134" font-size="11.5" font-weight="600" fill="#a8322f">자리를 읽기만 한다 → RuntimeError</text>
+    <text x="292" y="152" font-size="11" fill="#4a5560">코루틴은 태워지지도 못한 채 GC 된다</text>
+    <text class="cdxslot-mono" x="292" y="169" font-size="10" fill="#6f7780">never awaited 경고의 정체</text>
+
+    <!-- 갈래 2 : asyncio.run -->
+    <rect x="292" y="196" width="264" height="30" rx="7" fill="#fbf3df" stroke="#8a6a12" stroke-width="1.2"/>
+    <text class="cdxslot-mono" x="302" y="216" font-size="11.5" fill="#242a2f">asyncio.run(coro)</text>
+    <line x1="558" y1="211" x2="602" y2="224" stroke="#8a6a12" stroke-width="1.8" marker-end="url(#cdxslot-ar-temp)"/>
+    <text x="292" y="246" font-size="11.5" font-weight="600" fill="#8a6a12">빈 자리를 임시로 채워 완주시킨다</text>
+    <text x="292" y="264" font-size="11" fill="#4a5560">대신 이 줄이 끝날 때까지 응답이 못 나간다</text>
+
+    <!-- 갈래 3 : BackgroundTasks -->
+    <rect x="292" y="296" width="264" height="30" rx="7" fill="#eaeefa" stroke="#3a55a0" stroke-width="1.2"/>
+    <text class="cdxslot-mono" x="302" y="316" font-size="11.5" fill="#242a2f">background_tasks.add_task(...)</text>
+    <line x1="558" y1="311" x2="602" y2="311" stroke="#3a55a0" stroke-width="1.8" marker-end="url(#cdxslot-ar-defer)"/>
+    <text x="292" y="346" font-size="11.5" font-weight="600" fill="#3a55a0">자리를 아예 보지 않는다</text>
+    <text x="292" y="364" font-size="11" fill="#4a5560">실행 시점만 응답 뒤로 옮길 뿐,</text>
+    <text x="292" y="381" font-size="11" fill="#4a5560">굴리는 도구는 결국 위의 임시 루프다</text>
+  </g>
+</svg>
 </div>
 
-<div class="cdxls-stage">
-  <div class="cdxls-lane">
-    <span class="cdxls-lane-name"><b>이벤트 루프</b>단일 스레드</span>
-    <span class="cdxls-track" data-track="loop"><span class="cdxls-head" data-head></span></span>
-  </div>
-  <div class="cdxls-lane">
-    <span class="cdxls-lane-name"><b>anyio 워커</b>스레드풀</span>
-    <span class="cdxls-track" data-track="worker"></span>
-  </div>
-  <div class="cdxls-axis">
-    <span class="cdxls-axis-pad"></span>
-    <span class="cdxls-axis-track" data-axis></span>
-  </div>
-  <div class="cdxls-legend">
-    <span><i style="background:#4a5560"></i>핸들러 본문</span>
-    <span><i style="background:#1c7a44"></i>코루틴 실행</span>
-    <span><i style="background:#fc4d50"></i>응답 전송 시점</span>
-  </div>
-</div>
-
-<div class="cdxls-stats">
-  <div class="cdxls-stat"><div class="k">응답까지</div><div class="v" data-st-resp>—</div></div>
-  <div class="cdxls-stat"><div class="k">코루틴</div><div class="v" data-st-coro>—</div></div>
-  <div class="cdxls-stat"><div class="k">응답 코드</div><div class="v" data-st-code>—</div></div>
-</div>
-
-<div class="cdxls-verdict" data-verdict></div>
-
-<div class="cdxls-nojs">
-  <p style="margin:0 0 .6rem;color:#4a5560;font-size:.88rem">여섯 조합의 결과 요약입니다.</p>
-  <table>
-    <thead><tr><th>핸들러</th><th>호출</th><th>결과</th></tr></thead>
-    <tbody>
-      <tr><td><code>async def</code></td><td><code>create_task</code></td><td>동작 — 루프 위라 등록 성공, 논블로킹</td></tr>
-      <tr><td><code>async def</code></td><td><code>asyncio.run</code></td><td>예외 — 도는 루프 안에서 새 루프 불가</td></tr>
-      <tr><td><code>async def</code></td><td><code>BackgroundTasks</code></td><td>동작 — 응답 후 실행, 논블로킹</td></tr>
-      <tr><td><code>def</code></td><td><code>create_task</code></td><td>예외 — 워커에 도는 루프 없음 (이 글의 버그)</td></tr>
-      <tr><td><code>def</code></td><td><code>asyncio.run</code></td><td>동작하나 응답 블로킹 (버린 대안)</td></tr>
-      <tr><td><code>def</code></td><td><code>BackgroundTasks</code></td><td>동작 — 응답 후 실행, 논블로킹 (채택안)</td></tr>
-    </tbody>
-  </table>
-</div>
-
-<script>
-(function () {
-  var root = document.currentScript.closest('[data-cdxls]');
-  if (!root) return;
-  root.classList.add('js');
-
-  var H = 6, C = 8;            // 핸들러 본문 / 코루틴 소요 틱
-  var TICK = 110;              // ms per tick
-  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  // 조합별 스케줄. seg = {lane, start, len, kind, label}
-  function plan(h, m) {
-    var onLoop = h === 'async';
-    var lane = onLoop ? 'loop' : 'worker';
-    var p = { segs: [], bang: null, resp: H, code: 200, coro: 'done', total: 0, blocked: 0 };
-
-    p.segs.push({ lane: lane, start: 0, len: H, kind: 'handler', label: '핸들러 본문' });
-    // def 핸들러일 때 루프는 다른 요청을 계속 처리한다
-    if (!onLoop) p.segs.push({ lane: 'loop', start: 0, len: 0, kind: 'idle', label: '다른 요청 계속 처리', span: true });
-
-    if (m === 'task') {
-      if (onLoop) {
-        p.segs.push({ lane: 'loop', start: H, len: C, kind: 'coro', label: 'notify 코루틴' });
-        p.total = H + C;
-      } else {
-        p.bang = H; p.code = 500; p.coro = 'lost'; p.total = H + 3;
-        p.log = 'RuntimeError: no running event loop\nRuntimeWarning: coroutine \'notify\' was never awaited';
-      }
-    } else if (m === 'run') {
-      if (onLoop) {
-        p.bang = H; p.code = 500; p.coro = 'lost'; p.total = H + 3;
-        p.log = 'RuntimeError: asyncio.run() cannot be called\nfrom a running event loop';
-      } else {
-        p.segs.push({ lane: 'worker', start: H, len: C, kind: 'coro', label: 'asyncio.run — 응답을 붙잡는다' });
-        p.resp = H + C; p.blocked = C; p.total = H + C;
-      }
-    } else { // bg
-      p.segs.push({ lane: 'worker', start: H + 1, len: C, kind: 'coro', label: '응답 후 실행' });
-      p.total = H + 1 + C;
-    }
-    if (p.bang !== null) p.resp = p.bang;
-    p.segs.forEach(function (s) { if (s.span) s.len = p.total; });
-    return p;
-  }
-
-  var VERDICT = {
-    'async|task': { tag: null, html:
-      '<p><b>동작한다.</b> 루프가 도는 스레드 위라 <code>get_running_loop()</code> 이 성공하고, 태스크가 루프에 얹혀 핸들러와 나란히 진행된다.</p>' +
-      '<p>다만 루프는 태스크를 <b>약한 참조로만</b> 붙든다. 반환된 태스크 객체를 아무도 들고 있지 않으면 완료 전에 GC 될 수 있다 — 루프 위라고 fire-and-forget 이 공짜는 아니다.</p>' },
-    'async|run': { tag: null, html:
-      '<p><b>예외로 죽는다.</b> <code>asyncio.run()</code> 은 새 루프를 만드는 함수다. 이미 루프가 도는 스레드에서는 중첩이 불가능해 거부당한다.</p>' },
-    'async|bg': { tag: null, html:
-      '<p><b>동작한다.</b> 루프 위에서도 <code>BackgroundTasks</code> 는 그대로 쓸 수 있다. 등록만 하고 응답을 먼저 내보낸 뒤, 헬퍼가 워커 스레드에서 코루틴을 완주시킨다.</p>' },
-    'sync|task': { tag: '이 글의 버그', html:
-      '<p><b>바로 이 지점에서 터진다.</b> 워커 스레드에는 도는 루프가 없다. <code>create_task</code> 는 루프를 만들지 않고 <b>찾을</b> 뿐이라 그 줄에서 즉사하고, 핸들러는 500 을 뱉는다.</p>' +
-      '<p>띄우려던 코루틴은 태워지지도 <code>await</code> 되지도 못한 채 GC 되어 두 번째 경고를 남긴다. <b>두 줄은 별개 사건이 아니라 인과다.</b></p>' +
-      '<p>루프 레인을 보라 — 루프는 멀쩡히 살아 다른 요청을 처리하고 있다. 죽은 건 이 요청 하나다.</p>' },
-    'sync|run': { tag: '버린 대안', html:
-      '<p><b>굴러가긴 한다.</b> 도는 루프가 없는 스레드라 <code>asyncio.run()</code> 이 새 루프를 열어 코루틴을 완주시킨다. 예외는 안 난다.</p>' +
-      '<p>대신 <b>응답 마커가 코루틴 뒤로 밀린 것</b>을 보라. 알림이 끝날 때까지 핸들러가 반환하지 못한다. fire-and-forget 이 아니다.</p>' },
-    'sync|bg': { tag: '채택안', html:
-      '<p><b>이것이 답이다.</b> 핸들러는 등록만 하고 즉시 반환한다. 응답이 먼저 나가고, 그 뒤에 헬퍼가 전용 루프로 코루틴을 완주시킨다. 블로킹 없이 후처리가 실제로 실행되는 조합이다.</p>' +
-      '<p>단 같은 프로세스 안이라 <b>영속성도 재시도도 없다.</b> 반드시 완료돼야 하는 작업은 외부 큐의 몫이다.</p>' }
-  };
-
-  var els = {
-    loop: root.querySelector('[data-track="loop"]'),
-    worker: root.querySelector('[data-track="worker"]'),
-    head: root.querySelector('[data-head]'),
-    axis: root.querySelector('[data-axis]'),
-    status: root.querySelector('[data-status]'),
-    verdict: root.querySelector('[data-verdict]'),
-    resp: root.querySelector('[data-st-resp]'),
-    coro: root.querySelector('[data-st-coro]'),
-    code: root.querySelector('[data-st-code]'),
-    play: root.querySelector('[data-play]'),
-    reset: root.querySelector('[data-reset]')
-  };
-
-  var h = 'async', m = 'task', p = plan(h, m), t = 0, timer = null;
-
-  function pct(v) { return (v / p.total * 100) + '%'; }
-
-  function render() {
-    ['loop', 'worker'].forEach(function (ln) {
-      var host = els[ln];
-      host.querySelectorAll('.cdxls-blk,.cdxls-bang').forEach(function (n) { n.remove(); });
-      host.classList.remove('dead');
-    });
-    p.segs.forEach(function (s) {
-      var shown = Math.max(0, Math.min(s.len, t - s.start));
-      if (shown <= 0) return;
-      var d = document.createElement('span');
-      d.className = 'cdxls-blk ' + s.kind;
-      d.style.left = pct(s.start);
-      d.style.width = pct(shown);
-      d.textContent = shown / s.len > .45 ? s.label : '';
-      els[s.lane].appendChild(d);
-    });
-    if (p.bang !== null && t >= p.bang) {
-      var b = document.createElement('span');
-      b.className = 'cdxls-bang';
-      b.style.left = pct(p.bang);
-      els[h === 'async' ? 'loop' : 'worker'].appendChild(b);
-    }
-    els.head.style.left = pct(Math.min(t, p.total));
-
-    var reached = t >= p.resp;
-    els.axis.innerHTML = '<span class="cdxls-resp' + (p.code === 500 ? ' err' : '') +
-      (reached ? '' : ' pending') + '" style="left:' + pct(p.resp) + '">' +
-      '<i></i><span>' + (p.code === 500 ? '500' : '응답 전송') + '</span></span>';
-
-    els.resp.textContent = reached ? p.resp + '틱' : '—';
-    els.resp.className = 'v' + (reached && p.blocked ? ' warn' : '');
-    var done = t >= p.total;
-    els.coro.textContent = p.coro === 'lost' ? (t >= p.bang ? '유실' : '—') : (done ? '완주' : (t > 6 ? '실행 중' : '—'));
-    els.coro.className = 'v' + (p.coro === 'lost' ? (t >= p.bang ? ' err' : '') : (done ? ' ok' : ''));
-    els.code.textContent = reached ? (p.code === 500 ? '500' : '200') : '—';
-    els.code.className = 'v' + (reached ? (p.code === 500 ? ' err' : ' ok') : '');
-  }
-
-  function setStatus(txt, cls) { els.status.textContent = txt; els.status.className = 'cdxls-status ' + (cls || ''); }
-
-  function stop() { if (timer) { clearInterval(timer); timer = null; } els.play.textContent = '▶ 재생'; }
-
-  function reset() {
-    stop(); p = plan(h, m); t = 0; render();
-    setStatus('대기', '');
-    var v = VERDICT[h + '|' + m];
-    els.verdict.innerHTML =
-      '<span class="cdxls-status ' + (p.code === 500 ? 'err' : (p.blocked ? 'warn' : 'ok')) + '" style="margin:0">' +
-      (p.code === 500 ? '예외' : (p.blocked ? '동작하지만 블로킹' : '동작')) + '</span>' +
-      (v.tag ? '<span class="cdxls-tag">' + v.tag + '</span>' : '') +
-      v.html + (p.log ? '<p class="cdxls-log">' + p.log + '</p>' : '');
-  }
-
-  function finish() {
-    stop();
-    if (p.code === 500) setStatus('✕ ' + (h === 'sync' ? 'no running event loop' : 'run() 중첩 불가'), 'err');
-    else if (p.blocked) setStatus('완료 — 응답이 ' + p.blocked + '틱 지연', 'warn');
-    else setStatus('완료 — 논블로킹', 'ok');
-  }
-
-  function play() {
-    if (timer) { stop(); setStatus('일시정지', ''); return; }
-    if (t >= p.total) { t = 0; }
-    if (reduced) { t = p.total; render(); finish(); return; }
-    els.play.textContent = '❙❙ 일시정지';
-    setStatus('재생 중…', '');
-    timer = setInterval(function () {
-      t++; render();
-      if (t >= p.total) finish();
-    }, TICK);
-  }
-
-  root.querySelectorAll('[data-h],[data-m]').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var key = btn.hasAttribute('data-h') ? 'data-h' : 'data-m';
-      root.querySelectorAll('[' + key + ']').forEach(function (o) { o.setAttribute('aria-pressed', String(o === btn)); });
-      if (key === 'data-h') h = btn.getAttribute('data-h'); else m = btn.getAttribute('data-m');
-      reset();
-    });
-  });
-  els.play.addEventListener('click', play);
-  els.reset.addEventListener('click', reset);
-
-  reset();
-})();
-</script>
-</div>
+<figcaption class="cdxslot-cap">
+  <code>create_task</code> 는 넘겨받은 코루틴을 보지 않는다 — <b>자기가 선 스레드의 루프 자리</b>를 볼 뿐이다.
+  그 자리는 스레드마다 따로 파여 있고, <code>def</code> 핸들러가 오프로드된 워커 스레드에서는 비어 있다.
+  빈 자리 앞에서 남는 선택지는 둘뿐이다: 임시 루프로 <b>지금 채우거나</b>(응답을 붙잡는 대가),
+  채우는 일을 <b>응답 뒤로 미루거나</b>.
+</figcaption>
+</figure>
