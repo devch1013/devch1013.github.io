@@ -1,425 +1,403 @@
-<div class="cdxpg" data-cdxpg>
+<figure class="cdxsc" data-setscope>
 <style>
-.cdxpg {
-  --ok:#1c7a44; --ok-s:#e3f4e9;
-  --warn:#99650a; --warn-s:#fdf1dd;
-  --err:#c0292c; --err-s:#fde8e8;
-  --line:rgba(0,0,0,.13); --line-2:rgba(0,0,0,.24);
-  --muted:#8a8a8a; --ink:#222; --ink-2:#4a5560;
-  --surface:#fafafa; --set:#4f5bab;
-  border:1px solid var(--line-2);
-  border-radius:12px;
-  margin:1.8rem 0;
-  overflow:hidden;
-  font-size:.93rem;
-  line-height:1.6;
-  background:#fff;
+.cdxsc {
+  --ink:#22303c;
+  --rule:#dce2e8;
+  --off:#8a94a0;
+  --on:#b4531f;
+  --copy:#2f6f8f;
+  --bad:#a3122b;
+  --good:#1d6b4f;
+  --k:4.6rem;
+  --slot:64px;
+  margin: 1.6em 0;
+  padding: 0;
+  color: var(--ink);
+  font-size: .92rem;
+  line-height: 1.55;
 }
-.cdxpg * { box-sizing:border-box; }
+.cdxsc-mono {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+.cdxsc-lede {
+  margin: 0 0 .7em;
+}
+.cdxsc-lede b {
+  font-weight: 600;
+  border-bottom: 2px solid var(--copy);
+}
+.cdxsc-key {
+  margin: 0 0 1.1em;
+  padding: .55em .7em;
+  border: 1px solid var(--rule);
+  font-size: .84rem;
+  line-height: 1.9;
+}
+.cdxsc-key-row + .cdxsc-key-row {
+  margin-top: .15em;
+}
+.cdxsc-key-item {
+  display: inline-block;
+  margin-right: 1.1em;
+  white-space: nowrap;
+}
+.cdxsc-chip {
+  display: inline-block;
+  min-width: 2.1em;
+  padding: 0 .3em;
+  text-align: center;
+  font-style: normal;
+  font-size: .78rem;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  border: 1px solid var(--rule);
+  vertical-align: 1px;
+}
+.cdxsc-chip.is-on  { color: #fff; background: var(--on); border-color: var(--on); }
+.cdxsc-chip.is-off { color: var(--off); background: #fff; }
+.cdxsc-chip.is-none {
+  color: var(--off);
+  background: repeating-linear-gradient(135deg, #fff, #fff 3px, #eef1f4 3px, #eef1f4 6px);
+}
+.cdxsc-good { color: var(--good); font-weight: 700; }
+.cdxsc-bad  { color: var(--bad);  font-weight: 700; }
+.cdxsc-arrowkey { color: var(--copy); font-weight: 700; }
 
-/* ---------- controls ---------- */
-.cdxpg .cdxpg-ctrls {
-  display:flex; align-items:center; gap:.5rem; flex-wrap:wrap;
-  padding:.85rem 1rem; border-bottom:1px solid var(--line); background:var(--surface);
+.cdxsc-scroll { overflow-x: auto; }
+.cdxsc-grid {
+  min-width: calc(var(--k) + 8 * var(--slot));
 }
-.cdxpg .cdxpg-seg { display:inline-flex; border:1px solid var(--line-2); border-radius:8px; overflow:hidden; }
-.cdxpg .cdxpg-seg button {
-  font-family:Menlo,Consolas,monospace; font-size:.72rem; font-weight:600;
-  border:0; cursor:pointer; padding:.5rem .7rem; background:transparent; color:var(--muted);
-  transition:background .15s, color .15s;
+.cdxsc-row {
+  display: grid;
+  grid-template-columns: var(--k) repeat(8, minmax(var(--slot), 1fr));
+  align-items: stretch;
 }
-.cdxpg .cdxpg-seg button + button { border-left:1px solid var(--line); }
-.cdxpg .cdxpg-seg button:hover { background:rgba(0,0,0,.04); color:var(--ink); }
-.cdxpg .cdxpg-seg button[aria-pressed="true"] { background:#fc4d50; color:#fff; }
-.cdxpg .cdxpg-btn {
-  font-family:Menlo,Consolas,monospace; font-size:.72rem; font-weight:600; cursor:pointer;
-  padding:.5rem .7rem; border-radius:8px; border:1px solid var(--line-2);
-  background:#fff; color:var(--ink); transition:background .15s;
-}
-.cdxpg .cdxpg-btn:hover { background:rgba(0,0,0,.04); }
-.cdxpg button:focus-visible { outline:2px solid #fc4d50; outline-offset:2px; }
-.cdxpg .cdxpg-status {
-  margin-left:auto; font-family:Menlo,Consolas,monospace; font-size:.7rem; font-weight:700;
-  padding:.3rem .7rem; border-radius:999px; border:1px solid var(--line-2); color:var(--muted);
-  white-space:nowrap;
-}
-.cdxpg .cdxpg-status.ok   { color:var(--ok);   border-color:var(--ok);   background:var(--ok-s); }
-.cdxpg .cdxpg-status.warn { color:var(--warn); border-color:var(--warn); background:var(--warn-s); }
-.cdxpg .cdxpg-status.err  { color:var(--err);  border-color:var(--err);  background:var(--err-s); }
-
-/* ---------- stage ---------- */
-.cdxpg .cdxpg-stage { padding:1.1rem 1rem .6rem; }
-.cdxpg .cdxpg-lane { display:flex; align-items:center; gap:.7rem; margin-bottom:.45rem; }
-.cdxpg .cdxpg-lane-name {
-  flex:none; width:10.2rem; font-family:Menlo,Consolas,monospace; font-size:.66rem;
-  color:var(--muted); text-align:right; line-height:1.3;
-}
-.cdxpg .cdxpg-lane-name b { display:block; color:var(--ink-2); font-size:.72rem; font-weight:600; }
-.cdxpg .cdxpg-track {
-  position:relative; flex:1; height:40px; border:1px dashed var(--line-2);
-  border-radius:7px; background:var(--surface); overflow:hidden;
-}
-.cdxpg .cdxpg-blk {
-  position:absolute; top:5px; bottom:5px; border-radius:5px;
-  display:flex; align-items:center; padding:0 .45rem; overflow:hidden;
-  font-family:Menlo,Consolas,monospace; font-size:.64rem; font-weight:600;
-  white-space:nowrap; color:#fff; transition:width .1s linear;
-}
-.cdxpg .cdxpg-blk.tx    { background:#4a5560; }
-.cdxpg .cdxpg-blk.set   { background:var(--set); }
-.cdxpg .cdxpg-blk.write { background:var(--ok); }
-.cdxpg .cdxpg-blk.boom  { background:var(--err); }
-.cdxpg .cdxpg-blk.idle {
-  background:repeating-linear-gradient(135deg,rgba(0,0,0,.05) 0 6px,transparent 6px 12px);
-  color:var(--muted); border:1px solid var(--line);
-}
-.cdxpg .cdxpg-bang { position:absolute; top:0; bottom:0; width:3px; background:var(--err); }
-.cdxpg .cdxpg-bang::after {
-  content:"✕"; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-  color:var(--err); font-size:.85rem; font-weight:700;
-  background:#fff; border:1.5px solid var(--err); border-radius:50%;
-  width:1.1rem; height:1.1rem; display:flex; align-items:center; justify-content:center;
+.cdxsc-scope {
+  align-self: center;
+  padding-right: .5em;
+  text-align: right;
+  font-size: .78rem;
+  color: var(--off);
 }
 
-/* ---------- guc gauges ---------- */
-.cdxpg .cdxpg-gauge { display:flex; height:20px; gap:2px; }
-.cdxpg .cdxpg-cell { flex:1; border-radius:2px; background:rgba(0,0,0,.05); transition:background .12s linear; }
-.cdxpg .cdxpg-cell.off  { background:#dfe3e6; }
-.cdxpg .cdxpg-cell.on   { background:var(--err); }
-.cdxpg .cdxpg-cell.none { background:repeating-linear-gradient(135deg,rgba(0,0,0,.06) 0 4px,transparent 4px 8px); }
-.cdxpg .cdxpg-gauge-wrap { flex:1; }
-.cdxpg .cdxpg-gauge-legend {
-  font-family:Menlo,Consolas,monospace; font-size:.6rem; color:var(--muted);
-  margin-top:.15rem; display:flex; gap:.9rem;
+/* --- 공유 축 헤더 --- */
+.cdxsc-axis {
+  padding-bottom: .3em;
+  border-bottom: 2px solid var(--ink);
 }
-.cdxpg .cdxpg-gauge-legend i { font-style:normal; display:inline-flex; align-items:center; gap:.28rem; }
-.cdxpg .cdxpg-gauge-legend i::before {
-  content:""; width:.6rem; height:.6rem; border-radius:2px; background:#dfe3e6;
+.cdxsc-span {
+  padding: .1em .4em;
+  font-size: .78rem;
+  color: var(--ink);
+  border-bottom: 1px solid var(--rule);
 }
-.cdxpg .cdxpg-gauge-legend i.on::before { background:var(--err); }
+.cdxsc-span.t1 { grid-column: 2 / 6; }
+.cdxsc-span.t2 { grid-column: 6 / 9; }
+.cdxsc-span.t3 { grid-column: 9 / 10; color: var(--off); }
+.cdxsc-slot {
+  padding: .35em .3em 0;
+  font-size: .76rem;
+  text-align: center;
+}
+.cdxsc-slot-sub {
+  display: block;
+  font-size: .68rem;
+  color: var(--off);
+}
+.cdxsc-slot.aim .cdxsc-slot-sub { color: var(--ink); }
+.cdxsc-slot.aim { border: 1px dashed var(--ink); border-bottom: 0; }
 
-/* ---------- counters ---------- */
-.cdxpg .cdxpg-counts {
-  display:flex; gap:.5rem; flex-wrap:wrap; padding:.5rem 1rem .9rem;
+/* --- 패널 --- */
+.cdxsc-panel {
+  padding: .9em 0 1em;
+  border-bottom: 1px solid var(--rule);
 }
-.cdxpg .cdxpg-count {
-  font-family:Menlo,Consolas,monospace; font-size:.7rem; font-weight:600;
-  border:1px solid var(--line); border-radius:7px; padding:.35rem .65rem;
-  color:var(--ink-2); background:var(--surface);
+.cdxsc-panel:last-child { border-bottom: 0; }
+.cdxsc-stmt {
+  margin: 0 0 .5em;
+  font-size: .84rem;
+  line-height: 1.5;
 }
-.cdxpg .cdxpg-count b { color:var(--ink); font-size:.82rem; }
-.cdxpg .cdxpg-count.bad { border-color:var(--err); color:var(--err); background:var(--err-s); }
-.cdxpg .cdxpg-count.bad b { color:var(--err); }
-
-/* ---------- verdict ---------- */
-.cdxpg .cdxpg-verdict { padding:.9rem 1rem 1.1rem; border-top:1px solid var(--line); background:var(--surface); }
-.cdxpg .cdxpg-verdict p { margin:.45rem 0; font-size:.86rem; color:var(--ink-2); }
-.cdxpg .cdxpg-verdict p:first-of-type { margin-top:.6rem; }
-.cdxpg .cdxpg-verdict code {
-  font-family:Menlo,Consolas,monospace; font-size:.8rem;
-  background:rgba(0,0,0,.05); padding:.08rem .3rem; border-radius:3px;
+.cdxsc-stmt code {
+  padding: .05em .3em;
+  background: #f2f5f7;
+  border: 0;
+  font-size: .84rem;
 }
-.cdxpg .cdxpg-tag {
-  display:inline-block; margin-left:.4rem; font-family:Menlo,Consolas,monospace;
-  font-size:.66rem; font-weight:700; padding:.18rem .5rem; border-radius:999px;
-  border:1px solid var(--err); color:var(--err); background:var(--err-s);
-}
-.cdxpg .cdxpg-log {
-  font-family:Menlo,Consolas,monospace; font-size:.72rem; white-space:pre-wrap;
-  color:var(--err); background:var(--err-s); border:1px solid var(--err);
-  border-radius:6px; padding:.5rem .65rem; margin-top:.6rem !important;
+.cdxsc-end {
+  margin-left: .5em;
+  font-size: .74rem;
+  color: var(--off);
 }
 
-/* ---------- no-JS fallback ---------- */
-.cdxpg .cdxpg-static { padding:.2rem 1rem 1rem; }
-.cdxpg .cdxpg-static table { width:100%; font-size:.8rem; }
-.cdxpg.js .cdxpg-static { display:none; }
-.cdxpg:not(.js) .cdxpg-ctrls,
-.cdxpg:not(.js) .cdxpg-stage,
-.cdxpg:not(.js) .cdxpg-counts,
-.cdxpg:not(.js) .cdxpg-verdict { display:none; }
+.cdxsc-cell {
+  margin: 1px;
+  padding: .18em 0;
+  text-align: center;
+  font-size: .76rem;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  border: 1px solid var(--rule);
+}
+.cdxsc-cell.is-on   { color: #fff; background: var(--on); border-color: var(--on); }
+.cdxsc-cell.is-off  { color: var(--off); background: #fff; }
+.cdxsc-cell.is-none {
+  color: #b7bfc7;
+  border-style: dotted;
+  background: repeating-linear-gradient(135deg, #fff, #fff 3px, #eef1f4 3px, #eef1f4 6px);
+}
 
-@media (max-width:640px) {
-  .cdxpg .cdxpg-lane-name { width:100%; text-align:left; }
-  .cdxpg .cdxpg-lane { flex-wrap:wrap; gap:.25rem; }
+.cdxsc-copyrow { min-height: 2.1em; }
+.cdxsc-copy {
+  align-self: start;
+  text-align: center;
+  font-size: .7rem;
+  line-height: 1.15;
+  color: var(--copy);
+}
+.cdxsc-copy::before {
+  content: "";
+  display: block;
+  width: 0;
+  height: .7em;
+  margin: 0 auto;
+  border-left: 2px solid currentColor;
+}
+.cdxsc-copy .cdxsc-carry {
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+.cdxsc-copy.carries-on { color: var(--on); font-weight: 700; }
+
+.cdxsc-mark {
+  padding-top: .3em;
+  text-align: center;
+  font-size: .72rem;
+  line-height: 1.3;
+}
+.cdxsc-mark.ok  { color: var(--good); }
+.cdxsc-mark.bad { color: var(--bad); }
+.cdxsc-mark b { display: block; font-weight: 700; }
+.cdxsc-mark span { display: block; font-size: .68rem; }
+
+.cdxsc-note {
+  margin: .7em 0 0;
+  padding-left: .6em;
+  font-size: .84rem;
+  border-left: 3px solid var(--rule);
+}
+.cdxsc-panel.is-answer .cdxsc-note { border-left-color: var(--good); }
+.cdxsc-panel.is-bug .cdxsc-note { border-left-color: var(--bad); }
+
+.cdxsc-cap {
+  margin-top: 1em;
+  font-size: .82rem;
+  color: var(--off);
+}
+.cdxsc-cap code { font-size: .8rem; }
+
+/* JS 없이도 성립 */
+.cdxsc-fallback {
+  width: 100%;
+  margin: 0;
+  font-size: .82rem;
+}
+.cdxsc.js .cdxsc-fallback { display: none; }
+.cdxsc:not(.js) .cdxsc-scroll { display: none; }
+
+@media (max-width: 640px) {
+  .cdxsc { --k:3.4rem; --slot:56px; font-size: .88rem; }
 }
 </style>
 
-<div class="cdxpg-ctrls">
-  <div class="cdxpg-seg" role="group" aria-label="읽기전용을 거는 방법">
-    <button type="button" data-s="none"  aria-pressed="false">SET 없음</button>
-    <button type="button" data-s="sess"  aria-pressed="true">SET default_…</button>
-    <button type="button" data-s="local" aria-pressed="false">SET LOCAL default_…</button>
-    <button type="button" data-s="txro"  aria-pressed="false">SET TRANSACTION READ ONLY</button>
+<p class="cdxsc-lede">트랜잭션의 읽기전용 플래그는 <b>BEGIN 순간에 세션 기본값을 한 번 복사</b>해 오고 그걸로 끝이다. 넉 장을 세로로 훑으면서 <b>▼ 가 무엇을 실어 내리는지</b>만 보면 된다.</p>
+
+<div class="cdxsc-key">
+  <div class="cdxsc-key-row">
+    <span class="cdxsc-key-item">위 칸 <span class="cdxsc-mono">세션</span> = <code class="cdxsc-mono">default_transaction_read_only</code> — 커넥션이 끊길 때까지 산다</span>
   </div>
-  <div class="cdxpg-seg" role="group" aria-label="첫 트랜잭션의 종료 방식">
-    <button type="button" data-e="commit"   aria-pressed="true">COMMIT</button>
-    <button type="button" data-e="rollback" aria-pressed="false">ROLLBACK</button>
+  <div class="cdxsc-key-row">
+    <span class="cdxsc-key-item">아래 칸 <span class="cdxsc-mono">트랜잭션</span> = <code class="cdxsc-mono">transaction_read_only</code> — 실제로 쓰기를 거부하는 값</span>
   </div>
-  <button type="button" class="cdxpg-btn" data-play>▶ 재생</button>
-  <button type="button" class="cdxpg-btn" data-reset>↺ 리셋</button>
-  <span class="cdxpg-status" data-status>대기</span>
+  <div class="cdxsc-key-row">
+    <span class="cdxsc-key-item"><i class="cdxsc-chip is-on">on</i> 읽기전용</span>
+    <span class="cdxsc-key-item"><i class="cdxsc-chip is-off">off</i> 아님</span>
+    <span class="cdxsc-key-item"><i class="cdxsc-chip is-none">없음</i> 트랜잭션 밖 — 플래그 자체가 없다</span>
+    <span class="cdxsc-key-item"><b class="cdxsc-arrowkey">▼</b> BEGIN 의 복사</span>
+    <span class="cdxsc-key-item"><b class="cdxsc-good">✓</b><b class="cdxsc-bad">✗</b> 는 성공·실패가 아니라 <b>의도와 맞았는지</b></span>
+  </div>
 </div>
 
-<div class="cdxpg-stage">
-  <div class="cdxpg-lane">
-    <div class="cdxpg-lane-name"><b>서버 백엔드</b>풀러가 배정한 커넥션 1개</div>
-    <div class="cdxpg-track" data-track></div>
-  </div>
-  <div class="cdxpg-lane">
-    <div class="cdxpg-lane-name"><b>default_…read_only</b>세션에 남는 값</div>
-    <div class="cdxpg-gauge-wrap">
-      <div class="cdxpg-gauge" data-guc></div>
-    </div>
-  </div>
-  <div class="cdxpg-lane">
-    <div class="cdxpg-lane-name"><b>transaction_read_only</b>실제로 쓰기를 막는 값</div>
-    <div class="cdxpg-gauge-wrap">
-      <div class="cdxpg-gauge" data-txro></div>
-      <div class="cdxpg-gauge-legend">
-        <i>off — 쓰기 가능</i><i class="on">on — 쓰기 거부</i>
+<div class="cdxsc-scroll">
+  <div class="cdxsc-grid">
+    <div class="cdxsc-axis">
+      <div class="cdxsc-row">
+        <span class="cdxsc-scope"></span>
+        <span class="cdxsc-span t1">트랜잭션 1 — 읽기전용으로 만들려던 블록</span>
+        <span class="cdxsc-span t2">트랜잭션 2 — 같은 커넥션을 물려받은 다음 요청</span>
+        <span class="cdxsc-span t3">그 뒤</span>
+      </div>
+      <div class="cdxsc-row">
+        <span class="cdxsc-scope"></span>
+        <span class="cdxsc-slot">BEGIN</span>
+        <span class="cdxsc-slot">구문</span>
+        <span class="cdxsc-slot aim">쓰기<span class="cdxsc-slot-sub">막으려던 자리</span></span>
+        <span class="cdxsc-slot">끝</span>
+        <span class="cdxsc-slot">BEGIN</span>
+        <span class="cdxsc-slot">쓰기<span class="cdxsc-slot-sub">상관없는 요청</span></span>
+        <span class="cdxsc-slot">끝</span>
+        <span class="cdxsc-slot">…</span>
       </div>
     </div>
+    <div data-panels></div>
   </div>
 </div>
 
-<div class="cdxpg-counts">
-  <span class="cdxpg-count">쓰기 성공 <b data-ok>0</b> / 2</span>
-  <span class="cdxpg-count" data-blocked-box>차단된 쓰기 <b data-blocked>0</b></span>
-</div>
+<table class="cdxsc-fallback">
+  <thead>
+    <tr><th>구문</th><th>트랜잭션 1 의 쓰기</th><th>트랜잭션 2 의 쓰기</th><th>커넥션에 남나</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>SET default_transaction_read_only = true</code> + COMMIT</td><td>통과 (막지 못함)</td><td>거부 (남의 트랜잭션)</td><td>남는다</td></tr>
+    <tr><td><code>SET default_transaction_read_only = true</code> + ROLLBACK</td><td>통과 (막지 못함)</td><td>통과</td><td>안 남는다</td></tr>
+    <tr><td><code>SET LOCAL default_transaction_read_only = true</code></td><td>통과 (막지 못함)</td><td>통과</td><td>안 남는다</td></tr>
+    <tr><td><code>SET TRANSACTION READ ONLY</code></td><td>거부 (의도대로)</td><td>통과</td><td>안 남는다</td></tr>
+  </tbody>
+</table>
 
-<div class="cdxpg-verdict" data-verdict></div>
-
-<div class="cdxpg-static">
-  <table>
-    <thead><tr><th>거는 방법</th><th>T1 의 쓰기</th><th>T2 의 쓰기</th></tr></thead>
-    <tbody>
-      <tr><td><code>SET default_…</code> + COMMIT</td><td>통과 (못 막음)</td><td><b>차단 — 남의 트랜잭션이 죽는다</b></td></tr>
-      <tr><td><code>SET default_…</code> + ROLLBACK</td><td>통과 (못 막음)</td><td>통과</td></tr>
-      <tr><td><code>SET LOCAL default_…</code></td><td>통과 (못 막음)</td><td>통과</td></tr>
-      <tr><td><code>SET TRANSACTION READ ONLY</code></td><td><b>차단 — 의도한 대로</b></td><td>통과</td></tr>
-    </tbody>
-  </table>
-</div>
+<figcaption class="cdxsc-cap">
+  아래 칸이 트랜잭션 밖에서 사라지는 것이 요점이다 — 트랜잭션 플래그는 남을 수가 없고, 커넥션에 남는 것은 언제나 위 칸뿐이다.
+  <code class="cdxsc-mono">SET SESSION CHARACTERISTICS AS TRANSACTION READ ONLY</code> 는 이름만 다를 뿐 첫 장과 같은 그림이다.
+</figcaption>
 
 <script>
 (function () {
-  var root = document.currentScript.closest('[data-cdxpg]');
+  var root = document.currentScript.closest('[data-setscope]');
   if (!root) return;
-  root.classList.add('js');
 
-  var TOTAL = 12;          // 전체 틱
-  var W1 = 3, W2 = 9;      // 두 번의 UPDATE 시작 틱
-  var TICK = 190;          // ms per tick
-  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* ===== scope-model:start ===== */
+  // 커넥션 하나의 일생을 슬롯 8칸으로 훑으면서
+  // 세션 기본값(top) 과 트랜잭션 플래그(bottom) 를 각각 기록한다.
+  var SLOTS = ['begin1', 'stmt', 'write1', 'end1', 'begin2', 'write2', 'end2', 'after'];
 
-  var SETLABEL = {
-    sess:  'SET default_transaction_read_only = on',
-    local: 'SET LOCAL default_transaction_read_only = on',
-    txro:  'SET TRANSACTION READ ONLY'
-  };
+  function traceScope(stmt, ending) {
+    var sessionDefault = false;  // default_transaction_read_only — 세션에 산다
+    var txFlag = null;           // transaction_read_only — 트랜잭션 안에서만 존재한다
+    var localSet = false;        // SET LOCAL 로 바꾼 상태인가
+    var top = [], bottom = [], arrows = [], marks = [];
 
-  // 조합별 스케줄을 통째로 미리 계산한다 (재생헤드가 훑기만 한다).
-  function plan(s, e) {
-    var p = { segs: [], guc: [], txro: [], bang: null, where: null, ok: 0, blocked: 0 };
-
-    // ── 세션에 남는 값: default_transaction_read_only
-    // SET 은 틱1~2 에 실행되므로 틱3부터 반영된다.
-    var leaks = (s === 'sess' && e === 'commit');   // 커밋해야만 세션에 남는다
-    var scoped = (s === 'sess' || s === 'local');   // 어느 쪽이든 T1 안에서는 켜져 보인다
-    for (var t = 0; t < TOTAL; t++) {
-      var on = false;
-      if (scoped && t >= 3) on = (t <= 5) ? true : leaks;  // 틱6 = 트랜잭션 종료 시점
-      p.guc.push(on ? 'on' : 'off');
-    }
-
-    // ── 실제로 쓰기를 막는 값: transaction_read_only
-    // T1(0~5) 시작 시점의 default 는 항상 off → SET default_… 로는 이번 트랜잭션을 못 막는다.
-    // SET TRANSACTION READ ONLY 만 현재 트랜잭션에 즉시 적용된다.
-    for (var t2 = 0; t2 < TOTAL; t2++) {
-      if (t2 === 6) { p.txro.push('none'); continue; }        // 트랜잭션 밖 (풀 반납)
-      if (t2 <= 5) p.txro.push(s === 'txro' && t2 >= 3 ? 'on' : 'off');
-      else p.txro.push(p.guc[7] === 'on' ? 'on' : 'off');     // T2 는 시작 시점 default 를 복사
-    }
-
-    // ── 무대 블록
-    p.segs.push({ start: 0, len: 1, kind: 'tx', label: 'BEGIN' });
-    if (s === 'none') p.segs.push({ start: 1, len: 2, kind: 'idle', label: '(설정 없음)' });
-    else p.segs.push({ start: 1, len: 2, kind: 'set', label: SETLABEL[s] });
-
-    var w1Blocked = p.txro[W1] === 'on';
-    p.segs.push({ start: W1, len: 2, kind: w1Blocked ? 'boom' : 'write', label: 'UPDATE orders …' });
-    p.segs.push({ start: 5, len: 1, kind: 'tx', label: e === 'commit' ? 'COMMIT' : 'ROLLBACK' });
-    p.segs.push({ start: 6, len: 1, kind: 'idle', label: '풀에 반납' });
-    p.segs.push({ start: 7, len: 2, kind: 'tx', label: 'BEGIN — 다른 요청' });
-
-    var w2Blocked = p.txro[W2] === 'on';
-    p.segs.push({ start: W2, len: 2, kind: w2Blocked ? 'boom' : 'write', label: 'UPDATE users …' });
-    p.segs.push({ start: 11, len: 1, kind: 'tx', label: 'COMMIT' });
-
-    if (w1Blocked) { p.bang = W1; p.where = 'T1'; }
-    else if (w2Blocked) { p.bang = W2; p.where = 'T2'; }
-
-    p.blocked = (w1Blocked ? 1 : 0) + (w2Blocked ? 1 : 0);
-    p.ok = 2 - p.blocked;
-    return p;
-  }
-
-  var ERRLINE = 'ERROR: cannot execute UPDATE in a read-only transaction';
-
-  var VERDICT = {
-    'none': { tone: 'ok', badge: '통과 2/2', html:
-      '<p>기준선이다. 아무것도 걸지 않았으니 두 트랜잭션 모두 쓴다.</p>' +
-      '<p>아래 두 게이지가 <b>끝까지 회색</b>인 것을 봐 두자. 다른 조합에서 어디가 빨개지는지가 이 시뮬레이터의 전부다.</p>' },
-
-    'sess|commit': { tone: 'err', badge: '✕ 남의 트랜잭션이 죽었다', tag: '이 글의 버그', html:
-      '<p><b>✕ 가 T2 에 꽂혔다.</b> 막으려던 트랜잭션은 멀쩡히 쓰기를 통과했고, 아무 상관 없는 <b>다음</b> 트랜잭션이 죽었다. 정확히 반대로 동작한다.</p>' +
-      '<p>두 게이지를 겹쳐 보라. <code>default_…</code> 는 틱 3 부터 켜지지만 <code>transaction_read_only</code> 는 T1 내내 <b>꺼져 있다</b> — 기본값은 <b>이미 시작된</b> 트랜잭션에 소급되지 않기 때문이다.</p>' +
-      '<p>그리고 COMMIT 했기 때문에 그 값이 커넥션에 <b>남는다</b>. 풀에 반납된 뒤 T2 가 시작될 때 복사되어, 그제서야 처음으로 무언가를 막는다 — 막으면 안 되는 것을.</p>' },
-
-    'sess|rollback': { tone: 'warn', badge: '아무 일도 안 했다 — 2/2', html:
-      '<p><b>✕ 가 아무 데도 없다.</b> 쓰기 두 번이 다 통과했다. 읽기전용 가드를 걸어놓고 얻은 게 0 이다.</p>' +
-      '<p><code>SET</code> 은 <b>트랜잭션적</b>이라 ROLLBACK 과 함께 되돌아간다. 게이지가 틱 6 에서 회색으로 복귀하는 지점이 그것이다. 커넥션은 깨끗하게 반납된다.</p>' +
-      '<p>이 조합이 이 버그를 <b>간헐적으로</b> 만든다. 커밋한 경로만 오염시키므로, 재현을 시도하다 롤백 경로만 밟으면 "재현이 안 되는데" 로 끝난다.</p>' },
-
-    'local|commit': { tone: 'warn', badge: '아무 일도 안 했다 — 2/2', html:
-      '<p><b>✕ 가 아무 데도 없다.</b> <code>SET LOCAL</code> 은 커넥션 오염을 확실히 막아 준다 — 틱 6 에서 게이지가 회색으로 돌아오고 T2 는 안전하다.</p>' +
-      '<p>하지만 <b>가드는 여전히 무동작이다.</b> 바꾼 것이 <code>default_…</code> 인 이상 이번 트랜잭션에는 소급되지 않는다. 아래 게이지는 끝까지 꺼진 채다.</p>' +
-      '<p>누수만 고치고 원래 의도는 놓친 상태 — 겉보기엔 멀쩡해서 가장 오래 살아남는 종류의 버그다.</p>' },
-
-    'local|rollback': { tone: 'warn', badge: '아무 일도 안 했다 — 2/2', html:
-      '<p>위와 같다. <code>SET LOCAL</code> 은 종료 방식과 무관하게 트랜잭션 끝에서 되돌아가므로 커넥션은 늘 깨끗하다.</p>' +
-      '<p>그리고 늘 그렇듯 <b>아무것도 막지 못한다.</b></p>' },
-
-    'txro': { tone: 'ok', badge: '의도대로 차단 — 1/2', html:
-      '<p><b>✕ 가 T1 에 꽂혔다.</b> 막으려던 바로 그 트랜잭션이 막혔다. 이게 원래 원했던 동작이다.</p>' +
-      '<p>아래 게이지를 보라 — <code>transaction_read_only</code> 가 틱 3 에서 켜진다. <code>SET TRANSACTION</code> 은 기본값이 아니라 <b>현재 트랜잭션의 플래그를 직접</b> 바꾸기 때문이다.</p>' +
-      '<p>동시에 위 게이지는 <b>끝까지 회색</b>이다. 세션에 아무것도 남기지 않으므로 COMMIT 이든 ROLLBACK 이든 T2 는 영향을 받지 않는다. 차단은 정확히 한 트랜잭션 안에서 시작하고 끝난다.</p>' }
-  };
-
-  function verdictFor(s, e) {
-    if (s === 'none') return VERDICT['none'];
-    if (s === 'txro') return VERDICT['txro'];
-    return VERDICT[s + '|' + e];
-  }
-
-  var els = {
-    track:   root.querySelector('[data-track]'),
-    guc:     root.querySelector('[data-guc]'),
-    txro:    root.querySelector('[data-txro]'),
-    ok:      root.querySelector('[data-ok]'),
-    blocked: root.querySelector('[data-blocked]'),
-    blockedBox: root.querySelector('[data-blocked-box]'),
-    verdict: root.querySelector('[data-verdict]'),
-    status:  root.querySelector('[data-status]'),
-    play:    root.querySelector('[data-play]'),
-    reset:   root.querySelector('[data-reset]')
-  };
-
-  var s = 'sess', e = 'commit', p = plan(s, e), t = 0, timer = null;
-
-  function setStatus(txt, cls) {
-    els.status.textContent = txt;
-    els.status.className = 'cdxpg-status' + (cls ? ' ' + cls : '');
-  }
-
-  function pct(n) { return (n / TOTAL * 100) + '%'; }
-
-  function render() {
-    // 무대
-    var html = '';
-    p.segs.forEach(function (g) {
-      var shown = Math.max(0, Math.min(t - g.start, g.len));
-      if (shown <= 0) return;
-      html += '<div class="cdxpg-blk ' + g.kind + '" style="left:' + pct(g.start) +
-              ';width:' + pct(shown) + '">' + g.label + '</div>';
-    });
-    if (p.bang !== null && t > p.bang) {
-      html += '<div class="cdxpg-bang" style="left:' + pct(p.bang) + '"></div>';
-    }
-    els.track.innerHTML = html;
-
-    // 게이지 두 줄
-    function gauge(arr) {
-      var h = '';
-      for (var i = 0; i < TOTAL; i++) {
-        h += '<div class="cdxpg-cell ' + (i < t ? arr[i] : '') + '"></div>';
+    for (var i = 0; i < SLOTS.length; i++) {
+      var s = SLOTS[i];
+      if (s === 'begin1' || s === 'begin2') {
+        txFlag = sessionDefault;                       // ← 복사는 여기서 딱 한 번
+        arrows.push({ slot: i, carries: sessionDefault });
+      } else if (s === 'stmt') {
+        if (stmt === 'set') {
+          sessionDefault = true;
+        } else if (stmt === 'setlocal') {
+          sessionDefault = true; localSet = true;
+        } else if (stmt === 'settx') {
+          txFlag = true;                               // 현재 플래그를 직접 쓴다
+        }
+      } else if (s === 'write1' || s === 'write2') {
+        var rejected = txFlag === true;
+        var intended = (s === 'write1');               // 막으려던 자리는 첫 트랜잭션뿐
+        marks.push({
+          slot: i,
+          rejected: rejected,
+          intended: intended,
+          ok: rejected === intended,
+          kind: intended
+            ? (rejected ? 'intended' : 'noguard')
+            : (rejected ? 'collateral' : 'normal')
+        });
+      } else if (s === 'end1') {
+        // SET 은 롤백 대상이고, SET LOCAL 은 트랜잭션이 끝나면 되돌아간다
+        if (ending === 'rollback' || localSet) sessionDefault = false;
+        localSet = false;
+        txFlag = null;
+      } else if (s === 'end2') {
+        txFlag = null;
       }
-      return h;
+      top.push(sessionDefault);
+      bottom.push(txFlag);
     }
-    els.guc.innerHTML = gauge(p.guc);
-    els.txro.innerHTML = gauge(p.txro);
+    return { slots: SLOTS, top: top, bottom: bottom, arrows: arrows, marks: marks };
+  }
+  /* ===== scope-model:end ===== */
 
-    // 카운터 — 재생헤드가 지난 쓰기만 센다
-    var ok = 0, blocked = 0;
-    [[W1, 0], [W2, 1]].forEach(function (w) {
-      if (t <= w[0]) return;
-      if (p.txro[w[0]] === 'on') blocked++; else ok++;
-    });
-    els.ok.textContent = ok;
-    els.blocked.textContent = blocked;
-    els.blockedBox.className = 'cdxpg-count' + (blocked ? ' bad' : '');
+  var MARK_TEXT = {
+    intended:   ['✓ 쓰기 거부', '의도대로'],
+    noguard:    ['✗ 쓰기 통과', '가드 무동작'],
+    collateral: ['✗ 쓰기 거부', '무관한 요청이 죽는다'],
+    normal:     ['✓ 쓰기 통과', '정상']
+  };
+
+  var PANELS = [
+    { stmt: 'set', ending: 'commit', tone: 'is-bug',
+      sql: 'SET default_transaction_read_only = true', end: 'COMMIT',
+      note: '겨눈 트랜잭션은 뚫리고, 커넥션에 남은 값이 상관없는 다음 트랜잭션을 죽인다. 정확히 반대로 동작한다.' },
+    { stmt: 'set', ending: 'rollback', tone: '',
+      sql: 'SET default_transaction_read_only = true', end: 'ROLLBACK',
+      note: '같은 구문인데 롤백이면 아무것도 남지 않는다. SET 이 트랜잭션적이라서다 — 이 버그가 간헐적으로 보이는 이유이자, 롤백 경로로 재현하면 헛짚는 이유.' },
+    { stmt: 'setlocal', ending: 'commit', tone: '',
+      sql: 'SET LOCAL default_transaction_read_only = true', end: 'COMMIT',
+      note: '오염은 사라졌는데 겨눈 자리는 여전히 뚫려 있다. 누수만 고치고 원래 의도는 놓친 반쪽짜리.' },
+    { stmt: 'settx', ending: 'commit', tone: 'is-answer',
+      sql: 'SET TRANSACTION READ ONLY', end: 'COMMIT',
+      note: '복사를 기다리지 않고 아래 칸에 직접 쓴다. 위 칸은 한 번도 켜지지 않으므로 커넥션에 남을 것도 없다.' }
+  ];
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
-  function renderVerdict() {
-    var v = verdictFor(s, e);
-    var showLog = p.bang !== null && t > p.bang;
-    els.verdict.innerHTML =
-      '<span class="cdxpg-status ' + v.tone + '" style="margin:0">' + v.badge + '</span>' +
-      (v.tag ? '<span class="cdxpg-tag">' + v.tag + '</span>' : '') +
-      v.html +
-      (showLog ? '<p class="cdxpg-log">' + ERRLINE + '  ← ' + p.where + ' 에서</p>' : '');
+  function cellsRow(scope, cells) {
+    return '<div class="cdxsc-row"><span class="cdxsc-scope">' + esc(scope) + '</span>' +
+      cells.join('') + '</div>';
   }
 
-  function stop() {
-    if (timer) { clearInterval(timer); timer = null; }
-    els.play.textContent = '▶ 재생';
+  function renderPanel(cfg) {
+    var m = traceScope(cfg.stmt, cfg.ending);
+    var i, html = '';
+
+    var topCells = [], botCells = [], copyCells = [], markCells = [];
+    for (i = 0; i < m.slots.length; i++) {
+      topCells.push('<span class="cdxsc-cell ' + (m.top[i] ? 'is-on' : 'is-off') + '">' +
+        (m.top[i] ? 'on' : 'off') + '</span>');
+      botCells.push(m.bottom[i] === null
+        ? '<span class="cdxsc-cell is-none">없음</span>'
+        : '<span class="cdxsc-cell ' + (m.bottom[i] ? 'is-on' : 'is-off') + '">' +
+          (m.bottom[i] ? 'on' : 'off') + '</span>');
+      copyCells.push('<span></span>');
+      markCells.push('<span></span>');
+    }
+    for (i = 0; i < m.arrows.length; i++) {
+      var a = m.arrows[i];
+      copyCells[a.slot] = '<span class="cdxsc-copy' + (a.carries ? ' carries-on' : '') + '">▼' +
+        '<span class="cdxsc-carry">' + (a.carries ? 'on' : 'off') + '</span></span>';
+    }
+    for (i = 0; i < m.marks.length; i++) {
+      var k = m.marks[i];
+      var t = MARK_TEXT[k.kind];
+      markCells[k.slot] = '<span class="cdxsc-mark ' + (k.ok ? 'ok' : 'bad') + '">' +
+        '<b>' + t[0] + '</b><span>' + t[1] + '</span></span>';
+    }
+
+    html += '<section class="cdxsc-panel ' + cfg.tone + '">';
+    html += '<p class="cdxsc-stmt"><code class="cdxsc-mono">' + esc(cfg.sql) + '</code>' +
+      '<span class="cdxsc-end">끝: ' + esc(cfg.end) + '</span></p>';
+    html += cellsRow('세션', topCells);
+    html += '<div class="cdxsc-row cdxsc-copyrow"><span class="cdxsc-scope"></span>' +
+      copyCells.join('') + '</div>';
+    html += cellsRow('트랜잭션', botCells);
+    html += '<div class="cdxsc-row"><span class="cdxsc-scope"></span>' + markCells.join('') + '</div>';
+    html += '<p class="cdxsc-note">' + esc(cfg.note) + '</p>';
+    html += '</section>';
+    return html;
   }
 
-  function reset() {
-    stop();
-    p = plan(s, e);
-    t = 0;
-    render();
-    renderVerdict();
-    setStatus('대기', '');
-  }
-
-  function finish() {
-    stop();
-    var v = verdictFor(s, e);
-    setStatus(v.badge, v.tone);
-    renderVerdict();
-  }
-
-  function play() {
-    if (timer) { stop(); setStatus('일시정지', ''); return; }
-    if (t >= TOTAL) t = 0;
-    if (reduced) { t = TOTAL; render(); finish(); return; }
-    els.play.textContent = '❙❙ 일시정지';
-    setStatus('재생 중…', '');
-    timer = setInterval(function () {
-      t++;
-      render();
-      renderVerdict();
-      if (t >= TOTAL) finish();
-    }, TICK);
-  }
-
-  root.querySelectorAll('[data-s],[data-e]').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var key = btn.hasAttribute('data-s') ? 'data-s' : 'data-e';
-      root.querySelectorAll('[' + key + ']').forEach(function (o) {
-        o.setAttribute('aria-pressed', String(o === btn));
-      });
-      if (key === 'data-s') s = btn.getAttribute('data-s'); else e = btn.getAttribute('data-e');
-      reset();
-    });
-  });
-  els.play.addEventListener('click', play);
-  els.reset.addEventListener('click', reset);
-
-  reset();
+  var host = root.querySelector('[data-panels]');
+  host.innerHTML = PANELS.map(renderPanel).join('');
+  root.classList.add('js');
 })();
 </script>
-</div>
+</figure>
