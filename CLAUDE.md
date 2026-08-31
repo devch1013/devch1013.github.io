@@ -95,7 +95,7 @@ bundle exec jekyll build && (cd _site && python3 -m http.server 4399 &)
 
 The site ships a single light skin (`text_skin: default`, `#fff` background), so visuals don't need dark-mode variants.
 
-**Anything mermaid and Chart.js can't draw goes in `_includes/codex/<slug>.html`,** pulled in with `{% include codex/<slug>.html %}`.
+**Anything mermaid and Chart.js can't draw goes in `_includes/codex/<slug>.html`,** pulled in with `{% include codex/<slug>.html %}`. An entry may carry more than one — name the extras `<slug>-<name>.html`, give each its own wrapper class so their CSS can't leak into each other, and remember to stage every one of them: a missing include file builds fine locally and breaks the deploy.
 
 **The form is chosen per entry — there is no house widget.** Start from one sentence naming what the reader must understand from the picture, and let that sentence's shape pick the form: a layered view for surface-vs-reality, a recalculating panel when one value decides the outcome, a branch map for diverging paths, nested boxes for containment, inline SVG for spatial relationships, a matrix when the answer varies by combination, a playable timeline only when *time* is genuinely part of the insight. That list is examples, not a menu — invent the form the content asks for. Animation and interaction are options, never requirements; a still picture that explains better is the right answer — and the converse holds too, since "no fixed form" includes not defaulting to a still picture. Check the duplicate-skeleton rule below on the motion axis as well: entries that are all static have converged just as surely as entries that all animate. The only test is whether the form carries this entry's insight most precisely.
 
